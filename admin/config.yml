@@ -1,0 +1,156 @@
+# Decap CMS configuration.
+# Before publishing, replace YOUR-GITHUB-USERNAME/YOUR-REPO-NAME below.
+backend:
+  name: github
+  repo: YOUR-GITHUB-USERNAME/YOUR-REPO-NAME
+  branch: main
+  use_graphql: true
+
+media_folder: "assets/uploads"
+public_folder: "assets/uploads"
+
+site_url: "https://YOUR-GITHUB-USERNAME.github.io/YOUR-REPO-NAME"
+display_url: "https://YOUR-GITHUB-USERNAME.github.io/YOUR-REPO-NAME"
+publish_mode: simple
+
+collections:
+  - name: "skills_section"
+    label: "Skills Section"
+    format: "json"
+    files:
+      - name: "skills"
+        label: "Skills + Skill Map"
+        file: "content/skills.json"
+        fields:
+          - label: "Skill Lines"
+            name: "skills"
+            widget: "list"
+            summary: "{{fields.group}}"
+            fields:
+              - { label: "Skill Group", name: "group", widget: "string" }
+              - { label: "Summary", name: "summary", widget: "text" }
+              - { label: "Level", name: "level", widget: "number", value_type: "int", min: 1, max: 5, hint: "1 to 5 bars." }
+              - { label: "Focus Label", name: "focus", widget: "string", required: false, hint: "For example: Specialist line, Strong line, Growing line." }
+              - label: "Skill Items"
+                name: "items"
+                widget: "list"
+                field: { label: "Item", name: "item", widget: "string" }
+
+          - label: "Skill Map"
+            name: "skillMap"
+            widget: "list"
+            summary: "{{fields.label}}"
+            fields:
+              - { label: "Label", name: "label", widget: "string" }
+              - { label: "Value", name: "value", widget: "number", value_type: "int", min: 1, max: 5, hint: "1 to 5 on the radar chart." }
+
+          - label: "Tools & Technologies"
+            name: "toolGroups"
+            widget: "list"
+            summary: "{{fields.group}}"
+            fields:
+              - { label: "Category", name: "group", widget: "string", hint: "For example: Embedded / Firmware or Industrial Data / IIoT." }
+              - { label: "Summary", name: "summary", widget: "text" }
+              - { label: "Experience Context", name: "context", widget: "text", required: false, hint: "Explain where you used these tools." }
+              - label: "Tools"
+                name: "tools"
+                widget: "list"
+                field: { label: "Tool", name: "tool", widget: "string" }
+
+  - name: "portfolio"
+    label: "Portfolio"
+    format: "json"
+    files:
+      - name: "site"
+        label: "Site Content"
+        file: "content/site.json"
+        fields:
+          - label: "Profile"
+            name: "profile"
+            widget: "object"
+            fields:
+              - { label: "Name", name: "name", widget: "string" }
+              - { label: "Role", name: "role", widget: "string" }
+              - { label: "Short Role", name: "shortRole", widget: "string", required: false }
+              - { label: "Summary", name: "summary", widget: "text" }
+              - { label: "Profile Photo", name: "photo", widget: "image", required: false }
+              - { label: "Profile Photo Alt Text", name: "photoAlt", widget: "string", required: false }
+              - { label: "Location", name: "location", widget: "string" }
+              - { label: "Email", name: "email", widget: "string" }
+              - { label: "Phone", name: "phone", widget: "string", required: false }
+              - { label: "GitHub URL", name: "github", widget: "string" }
+              - { label: "GitHub Label", name: "githubLabel", widget: "string" }
+              - { label: "LinkedIn URL", name: "linkedin", widget: "string" }
+              - { label: "LinkedIn Label", name: "linkedinLabel", widget: "string" }
+              - { label: "CV File", name: "cv", widget: "file", required: false }
+
+          - label: "Projects"
+            name: "projects"
+            widget: "list"
+            summary: "{{fields.title}}"
+            fields:
+              - { label: "ID", name: "id", widget: "string", hint: "Use lowercase letters, numbers, and hyphens only, for example axon-hillock." }
+              - { label: "Part Number", name: "partNumber", widget: "string", required: false }
+              - { label: "Title", name: "title", widget: "string" }
+              - label: "Category"
+                name: "category"
+                widget: "select"
+                options:
+                  - { label: "Analog / IC", value: "analog-ic" }
+                  - { label: "Digital / FPGA", value: "digital-fpga" }
+                  - { label: "PCB / Hardware", value: "pcb-hardware" }
+                  - { label: "Embedded / IoT", value: "embedded-iot" }
+                  - { label: "Signal Processing", value: "signal-processing" }
+                  - { label: "Sensors / Instrumentation", value: "sensors-instrumentation" }
+                  - { label: "Robotics / Control", value: "robotics-control" }
+                  - { label: "RF / Wireless", value: "rf-wireless" }
+                  - { label: "Power / Energy", value: "power-energy" }
+                  - { label: "Software / C++", value: "software-cpp" }
+                  - { label: "AI / ML", value: "ai-ml" }
+              - { label: "Status", name: "status", widget: "string", required: false }
+              - { label: "Stack", name: "stack", widget: "string", required: false }
+              - { label: "Summary", name: "summary", widget: "text" }
+              - { label: "Details", name: "details", widget: "text", required: false }
+              - { label: "Image", name: "image", widget: "image", required: false }
+              - { label: "Image Alt Text", name: "imageAlt", widget: "string", required: false }
+              - { label: "Link Label", name: "linkLabel", widget: "string", required: false }
+              - { label: "Link URL", name: "linkUrl", widget: "string", required: false }
+              - { label: "Featured on Overview", name: "featured", widget: "boolean", default: false }
+
+          - label: "Experience"
+            name: "experience"
+            widget: "list"
+            summary: "{{fields.title}}"
+            fields:
+              - { label: "Period", name: "period", widget: "string" }
+              - { label: "Title", name: "title", widget: "string" }
+              - { label: "Tag", name: "tag", widget: "string", required: false }
+              - { label: "Place", name: "place", widget: "string", required: false, hint: "City and country, for example Sheffield, UK." }
+              - { label: "Summary", name: "summary", widget: "text" }
+              - { label: "Details", name: "details", widget: "text", required: false, hint: "Use this to explain what you personally built, tested, or improved." }
+              - label: "Highlights"
+                name: "highlights"
+                widget: "list"
+                required: false
+                field: { label: "Highlight", name: "highlight", widget: "string" }
+              - { label: "Image", name: "image", widget: "image", required: false }
+              - { label: "Image Alt Text", name: "imageAlt", widget: "string", required: false }
+
+          - label: "Certificates"
+            name: "certificates"
+            widget: "list"
+            summary: "{{fields.title}}"
+            fields:
+              - { label: "Title", name: "title", widget: "string" }
+              - { label: "Issuer", name: "issuer", widget: "string", required: false }
+              - { label: "Date", name: "date", widget: "string", required: false, hint: "For example: Jun 2026 or 2026." }
+              - { label: "Summary", name: "summary", widget: "text", required: false }
+              - label: "Related Skills"
+                name: "skills"
+                widget: "list"
+                required: false
+                field: { label: "Skill", name: "skill", widget: "string" }
+              - { label: "Image", name: "image", widget: "image", required: false }
+              - { label: "Image Alt Text", name: "imageAlt", widget: "string", required: false }
+              - { label: "Link Label", name: "linkLabel", widget: "string", required: false }
+              - { label: "Link URL", name: "linkUrl", widget: "string", required: false }

@@ -1,0 +1,299 @@
+{
+  "profile": {
+    "name": "Kaung Myat Tun",
+    "role": "Embedded Electronics | PCB Hardware | Intelligent Sensing Systems",
+    "shortRole": "Electronics & Embedded Systems Engineer",
+    "summary": "Electronics and embedded systems engineer focused on intelligent sensing, mixed-signal PCB hardware, firmware, robotics systems, and practical hardware/software integration.",
+    "why": "PLACEHOLDER - EDIT ME: I like hardware because it doesn't let you hide from a bad decision - the scope trace either matches the math or it doesn't.",
+    "nextFocus": "PLACEHOLDER - EDIT ME: Next, I'm aiming toward low-power sensor IC and mixed-signal roles, building on the tapeout and PCB work above.",
+    "photo": "",
+    "photoAlt": "Kaung Myat Tun profile photo",
+    "location": "Sheffield, UK",
+    "phone": "+44 7377 261996",
+    "email": "kaungmtun.austin@gmail.com",
+    "github": "https://github.com/Austin-MgKaung",
+    "githubLabel": "github.com/Austin-MgKaung",
+    "linkedin": "https://linkedin.com/in/kaung-myat-tun",
+    "linkedinLabel": "Kaung Myat Tun | LinkedIn",
+    "cv": "cv.pdf"
+  },
+  "skills": [
+    {
+      "group": "Analog / IC Design",
+      "summary": "CMOS circuit design, SPICE simulation, open-source PDK flow, and layout verification.",
+      "level": 4,
+      "focus": "Specialist line",
+      "items": [
+        "CMOS fundamentals",
+        "op-amps / OTAs",
+        "biasing and device sizing",
+        "SPICE simulation",
+        "layout, DRC, LVS",
+        "Sky130, XSchem, ngspice, Magic, Netgen"
+      ]
+    },
+    {
+      "group": "Digital / FPGA",
+      "summary": "RTL design, FPGA implementation, bus interfaces, pipelining, and clock-domain crossing.",
+      "level": 4,
+      "focus": "Strong line",
+      "items": [
+        "Verilog / SystemVerilog",
+        "RTL architecture",
+        "AXI / bus interfaces",
+        "pipelining",
+        "CDC design",
+        "Vivado, Verilator"
+      ]
+    },
+    {
+      "group": "Verification & Testing",
+      "summary": "Simulation-first hardware development with testbenches, formal checks, CI, and coverage.",
+      "level": 4,
+      "focus": "Strong line",
+      "items": [
+        "cocotb testbenches",
+        "formal verification",
+        "SymbiYosys",
+        "CI test pipelines",
+        "coverage-driven checks",
+        "debugging waveforms"
+      ]
+    },
+    {
+      "group": "PCB / Hardware",
+      "summary": "Mixed-signal board design, sensor interfaces, ADC signal chains, isolation, and practical bring-up.",
+      "level": 4,
+      "focus": "Strong line",
+      "items": [
+        "Altium Designer",
+        "signal-chain design",
+        "ADC / sensor interfaces",
+        "isolation amplifiers",
+        "op-amp circuits",
+        "hardware bring-up"
+      ]
+    },
+    {
+      "group": "Embedded / Software",
+      "summary": "Firmware, C/C++, RTOS concepts, board-level integration, and low-level debugging.",
+      "level": 3,
+      "focus": "Developing line",
+      "items": [
+        "C / C++",
+        "STM32 bare-metal",
+        "Zephyr RTOS",
+        "nRF52840",
+        "RISC-V RTL",
+        "serial and peripheral debugging"
+      ]
+    },
+    {
+      "group": "AI / Data / Tools",
+      "summary": "Python-based analysis, automation, early ML work, and data-structure/software projects.",
+      "level": 3,
+      "focus": "Growing line",
+      "items": [
+        "Python",
+        "NumPy / pandas",
+        "data analysis",
+        "automation scripts",
+        "ML fundamentals",
+        "C++ data structures"
+      ]
+    },
+    {
+      "group": "Lab / Measurement",
+      "summary": "Bench-level debugging and measurement workflows for electronics projects.",
+      "level": 4,
+      "focus": "Practical line",
+      "items": [
+        "oscilloscope",
+        "logic analyzer",
+        "signal generator",
+        "bench power supply",
+        "multimeter",
+        "fault isolation"
+      ]
+    }
+  ],
+  "skillMap": [
+    { "label": "Analog / IC", "value": 4 },
+    { "label": "Digital / FPGA", "value": 4 },
+    { "label": "PCB / Hardware", "value": 4 },
+    { "label": "Embedded", "value": 3 },
+    { "label": "AI / ML", "value": 2 },
+    { "label": "Software / C++", "value": 3 },
+    { "label": "Lab", "value": 4 }
+  ],
+  "projects": [
+    {
+      "id": "axon-hillock",
+      "partNumber": "AH-SKY130-01",
+      "title": "Axon-Hillock spiking neuron",
+      "category": "analog-ic",
+      "status": "Layout in progress",
+      "stack": "Sky130, XSchem/ngspice, Magic, TinyTapeout TTSKY26c",
+      "summary": "Analog tapeout project implementing an Axon-Hillock spiking neuron model on the Sky130 open-source PDK.",
+      "details": "Schematic capture and SPICE simulation are complete; full-custom layout is underway in Magic with LVS/DRC verification through Netgen. The project is framed as a silicon credential and a step toward ultra-low-power sensor IC research.",
+      "image": "",
+      "imageAlt": "Oscilloscope-style trace for an analog spiking neuron project",
+      "linkLabel": "",
+      "linkUrl": "",
+      "featured": true
+    },
+    {
+      "id": "vibecheck",
+      "partNumber": "VC-OTA-02",
+      "title": "VibeCheck dual-channel OTA and FIR DSP",
+      "category": "analog-ic",
+      "status": "Taped out",
+      "stack": "Sky130, TinyTapeout TTSKY26b",
+      "summary": "Mixed-signal tapeout combining a two-stage Miller-compensated OTA with a dual-channel FIR DSP block.",
+      "details": "This project demonstrates analog front-end design paired with digital signal processing on the same die, making it a strong portfolio centerpiece for mixed-signal IC roles.",
+      "image": "",
+      "imageAlt": "Mixed-signal IC project preview",
+      "linkLabel": "",
+      "linkUrl": "",
+      "featured": true
+    },
+    {
+      "id": "fir",
+      "partNumber": "FIR-AXI-03",
+      "title": "AXI4-Lite FIR filter accelerator",
+      "category": "signal-processing",
+      "status": "Complete",
+      "stack": "SystemVerilog, cocotb, formal verification",
+      "summary": "Standalone digital design project with AXI4-Lite control, FIR datapath logic, CDC handling, and verification.",
+      "details": "Built to demonstrate RTL architecture and verification methodology independent of analog tapeout work. Test coverage includes cocotb simulation and clock-domain-crossing checks.",
+      "image": "",
+      "imageAlt": "Digital FIR accelerator project preview",
+      "linkLabel": "",
+      "linkUrl": "",
+      "featured": true
+    },
+    {
+      "id": "fifo",
+      "partNumber": "FIFO-CDC-04",
+      "title": "CDC-safe asynchronous FIFO",
+      "category": "digital-fpga",
+      "status": "Complete",
+      "stack": "SystemVerilog, cocotb, SymbiYosys",
+      "summary": "Asynchronous FIFO using Gray-coded pointers for safe clock-domain crossing.",
+      "details": "Verified with cocotb-driven simulation and formal checks for CDC hazards using SymbiYosys. Prepared around interview topics including metastability, CDC, and Gray coding.",
+      "image": "",
+      "imageAlt": "Asynchronous FIFO project preview",
+      "linkLabel": "",
+      "linkUrl": "",
+      "featured": false
+    },
+    {
+      "id": "aes",
+      "partNumber": "AES-PIPE-05",
+      "title": "Pipelined AES-128 FPGA implementation",
+      "category": "digital-fpga",
+      "status": "Complete",
+      "stack": "Verilog, GitHub Actions, Verilator, lcov",
+      "summary": "Fully pipelined AES-128 implementation with CI-gated linting, simulation, and coverage.",
+      "details": "Treats an FPGA project with production-style rigor by running Verible linting, Verilator/cocotb simulation, and branch coverage reporting on every push.",
+      "image": "",
+      "imageAlt": "AES FPGA project preview",
+      "linkLabel": "",
+      "linkUrl": "",
+      "featured": false
+    },
+    {
+      "id": "adc",
+      "partNumber": "ADC-FMC-06",
+      "title": "Dual ADS8568 FMC carrier board",
+      "category": "pcb-hardware",
+      "status": "Complete",
+      "stack": "Altium, ADS8568, Nexys Video, Artix-7",
+      "summary": "Custom PCB carrying dual ADS8568 SAR ADCs in parallel 16-bit mode over an FMC interface.",
+      "details": "Involved full signal-chain analysis, component selection, and Altium PCB design for an FPGA-connected data acquisition board.",
+      "image": "",
+      "imageAlt": "ADC FMC carrier board project preview",
+      "linkLabel": "",
+      "linkUrl": "",
+      "featured": false
+    },
+    {
+      "id": "motor",
+      "partNumber": "MOT-ISO-07",
+      "title": "Three-phase motor current-sensing board",
+      "category": "pcb-hardware",
+      "status": "Complete",
+      "stack": "LEM LA55-P, OPA2197, ISO224, LTspice, Altium",
+      "summary": "Isolated signal-conditioning board for three-phase motor current sensing.",
+      "details": "Uses LEM LA55-P Hall-effect sensors, OPA2197 op-amps, ISO224 isolation amplifiers, REF6025 reference, and isolated DC-DC conversion. Simulated in LTspice and laid out in Altium.",
+      "image": "",
+      "imageAlt": "Motor current sensing board project preview",
+      "linkLabel": "",
+      "linkUrl": "",
+      "featured": false
+    },
+    {
+      "id": "embedded",
+      "partNumber": "EMB-RTOS-08",
+      "title": "Embedded firmware and RISC-V systems",
+      "category": "embedded-iot",
+      "status": "Selected work",
+      "stack": "STM32, Zephyr RTOS, nRF52840, RISC-V RTL",
+      "summary": "Grouped embedded-systems work covering firmware, RTOS development, and processor architecture.",
+      "details": "Shows the firmware and computer-architecture layer behind the mixed-signal and FPGA projects, including bare-metal STM32 work, Zephyr RTOS development, and RISC-V pipeline RTL.",
+      "image": "",
+      "imageAlt": "Embedded firmware project preview",
+      "linkLabel": "",
+      "linkUrl": "",
+      "featured": false
+    }
+  ],
+  "experience": [
+    {
+      "period": "Jul 2024 - Sep 2025",
+      "title": "Air Products",
+      "tag": "Electronics Engineer",
+      "place": "Basingstoke, UK",
+      "summary": "Worked on industrial IIoT sensing systems across firmware, custom PCB prototypes, wireless devices, and live data infrastructure.",
+      "details": "The role connected embedded hardware with real industrial monitoring workflows: device firmware, wireless modules, 4-layer prototype PCBs, sensor data pipelines, and dashboarding for real-time engineering visibility.",
+      "highlights": [
+        "Developed C and C# firmware for Nordic, Silicon Labs, and U-blox chipsets.",
+        "Prototyped custom 4-layer IIoT PCBs and supported hardware bring-up/debug.",
+        "Contributed to Python, Docker, MQTT, machine-learning, and Grafana data pipelines."
+      ],
+      "image": "",
+      "imageAlt": "Air Products electronics engineering placement"
+    },
+    {
+      "period": "Oct 2023 - Present",
+      "title": "Project MarsWorks",
+      "tag": "Software / Electronics Engineer",
+      "place": "Sheffield, UK",
+      "summary": "Developed rover localisation, sensor integration, motor control, and robotics software for a student Mars rover platform.",
+      "details": "This experience demonstrates practical robotics engineering: turning sensor inputs into navigation behaviour, integrating software with physical hardware, and testing mobility systems under realistic constraints.",
+      "highlights": [
+        "Built localisation and SLAM workflows using ROS and computer vision.",
+        "Integrated IMU and encoder inputs for motion estimation.",
+        "Designed and tested motor control systems for stable rover movement."
+      ],
+      "image": "",
+      "imageAlt": "Mars rover software and electronics project"
+    },
+    {
+      "period": "Jun 2024 - Jul 2024",
+      "title": "Pipebots, University of Sheffield",
+      "tag": "Research Assistant",
+      "place": "Sheffield, UK",
+      "summary": "Built and tested visual navigation software for autonomous robot motion estimation using optical-flow methods.",
+      "details": "The work focused on using live camera data to estimate movement and position, then validating the navigation approach across different surfaces to understand reliability in real-world conditions.",
+      "highlights": [
+        "Used the RAFT optical-flow algorithm for live visual motion estimation.",
+        "Processed camera data in real time to estimate robot movement and position.",
+        "Validated performance across multiple surface types."
+      ],
+      "image": "",
+      "imageAlt": "Autonomous robot visual navigation research"
+    }
+  ],
+  "certificates": []
+}

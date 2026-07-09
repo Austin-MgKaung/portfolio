@@ -1,0 +1,223 @@
+{
+  "skills": [
+    {
+      "group": "Analog / IC Design",
+      "summary": "CMOS circuit design, SPICE simulation, open-source PDK flow, and layout verification.",
+      "level": 4,
+      "focus": "Specialist line",
+      "items": [
+        "CMOS fundamentals",
+        "op-amps / OTAs",
+        "biasing and device sizing",
+        "SPICE simulation",
+        "layout, DRC, LVS",
+        "Sky130, XSchem, ngspice, Magic, Netgen"
+      ]
+    },
+    {
+      "group": "Digital / FPGA",
+      "summary": "RTL design, FPGA implementation, bus interfaces, pipelining, and clock-domain crossing.",
+      "level": 4,
+      "focus": "Strong line",
+      "items": [
+        "Verilog / SystemVerilog",
+        "RTL architecture",
+        "AXI / bus interfaces",
+        "pipelining",
+        "CDC design",
+        "Vivado, Verilator"
+      ]
+    },
+    {
+      "group": "Verification & Testing",
+      "summary": "Simulation-first hardware development with testbenches, formal checks, CI, and coverage.",
+      "level": 4,
+      "focus": "Strong line",
+      "items": [
+        "cocotb testbenches",
+        "formal verification",
+        "SymbiYosys",
+        "CI test pipelines",
+        "coverage-driven checks",
+        "debugging waveforms"
+      ]
+    },
+    {
+      "group": "PCB / Hardware",
+      "summary": "Mixed-signal board design, sensor interfaces, ADC signal chains, isolation, and practical bring-up.",
+      "level": 4,
+      "focus": "Strong line",
+      "items": [
+        "Altium Designer",
+        "signal-chain design",
+        "ADC / sensor interfaces",
+        "isolation amplifiers",
+        "op-amp circuits",
+        "hardware bring-up"
+      ]
+    },
+    {
+      "group": "Embedded / Software",
+      "summary": "Firmware, C/C++, RTOS concepts, board-level integration, and low-level debugging.",
+      "level": 3,
+      "focus": "Developing line",
+      "items": [
+        "C / C++",
+        "STM32 bare-metal",
+        "Zephyr RTOS",
+        "nRF52840",
+        "RISC-V RTL",
+        "serial and peripheral debugging"
+      ]
+    },
+    {
+      "group": "AI / Data / Tools",
+      "summary": "Python-based analysis, automation, early ML work, and data-structure/software projects.",
+      "level": 3,
+      "focus": "Growing line",
+      "items": [
+        "Python",
+        "NumPy / pandas",
+        "data analysis",
+        "automation scripts",
+        "ML fundamentals",
+        "C++ data structures"
+      ]
+    },
+    {
+      "group": "Lab / Measurement",
+      "summary": "Bench-level debugging and measurement workflows for electronics projects.",
+      "level": 4,
+      "focus": "Practical line",
+      "items": [
+        "oscilloscope",
+        "logic analyzer",
+        "signal generator",
+        "bench power supply",
+        "multimeter",
+        "fault isolation"
+      ]
+    }
+  ],
+  "skillMap": [
+    { "label": "Analog / IC", "value": 4 },
+    { "label": "Digital / FPGA", "value": 4 },
+    { "label": "PCB / Hardware", "value": 4 },
+    { "label": "Embedded", "value": 3 },
+    { "label": "AI / ML", "value": 2 },
+    { "label": "Software / C++", "value": 3 },
+    { "label": "Lab", "value": 4 }
+  ],
+  "toolGroups": [
+    {
+      "group": "Analog / IC",
+      "summary": "Open-source silicon and mixed-signal IC tools used for schematic capture, SPICE simulation, layout, and verification.",
+      "context": "Used for Sky130-based analog and mixed-signal projects including schematic simulation, layout, DRC, and LVS checks.",
+      "tools": [
+        "Sky130 PDK",
+        "XSchem",
+        "ngspice",
+        "Magic VLSI",
+        "Netgen",
+        "DRC",
+        "LVS",
+        "SPICE simulation",
+        "Mixed-signal design"
+      ]
+    },
+    {
+      "group": "Embedded / Firmware",
+      "summary": "Tools and platforms used for firmware development, wireless device work, chipset integration, and board-level debugging.",
+      "context": "Used across industrial embedded systems and personal electronics projects, especially where firmware connects directly to sensors, wireless modules, and custom hardware.",
+      "tools": [
+        "C",
+        "C#",
+        "C++",
+        "STM32",
+        "STM32CubeIDE",
+        "IAR Embedded Workbench",
+        "Nordic nRF",
+        "Silicon Labs",
+        "U-blox",
+        "Zephyr RTOS"
+      ]
+    },
+    {
+      "group": "Industrial Data / IIoT",
+      "summary": "Tools used for sensor data collection, device communication, containers, dashboards, and real-time engineering visibility.",
+      "context": "Used during industry placement work involving IIoT devices, MQTT data movement, Python services, Docker-based deployment, Grafana dashboards, and early machine-learning workflows.",
+      "tools": [
+        "Python",
+        "MQTT",
+        "Docker",
+        "Grafana",
+        "Machine learning",
+        "Data pipelines",
+        "Real-time dashboards",
+        "Sensor telemetry"
+      ]
+    },
+    {
+      "group": "PCB / Lab",
+      "summary": "Hardware design and bench tools used for schematic capture, PCB layout, mixed-signal signal chains, and practical electronics debugging.",
+      "context": "Used for custom PCB design, sensor interfaces, motor current sensing, ADC boards, simulation, measurement, and hardware bring-up.",
+      "tools": [
+        "Altium Designer",
+        "Autodesk EAGLE",
+        "LTspice",
+        "Schematic capture",
+        "PCB layout",
+        "Oscilloscope",
+        "Logic analyzer",
+        "Signal generator",
+        "Bench power supply",
+        "Multimeter",
+        "Hardware bring-up"
+      ]
+    },
+    {
+      "group": "Mechanical / 3D CAD",
+      "summary": "Mechanical CAD and rapid-prototyping tools used for enclosures, brackets, mounting parts, and electronics packaging.",
+      "context": "Useful for showing that hardware work does not stop at the PCB: boards still need mechanical fit, mounting, cable access, enclosure design, and printed prototypes.",
+      "tools": [
+        "SolidWorks",
+        "Autodesk Fusion 360",
+        "3D printing",
+        "Enclosure design",
+        "Mounting brackets",
+        "Mechanical fit checks",
+        "Rapid prototyping"
+      ]
+    },
+    {
+      "group": "Robotics / AI",
+      "summary": "Robotics and vision tools used for navigation, localisation, optical-flow motion estimation, and sensor fusion.",
+      "context": "Used in MarsWorks and Pipebots work for rover localisation, SLAM, camera-based motion estimation, and robot sensor integration.",
+      "tools": [
+        "ROS",
+        "OpenCV",
+        "SLAM",
+        "RAFT optical flow",
+        "Computer vision",
+        "IMU",
+        "Encoders",
+        "Motor control"
+      ]
+    },
+    {
+      "group": "FPGA / Verification",
+      "summary": "Digital design and verification tools used for RTL development, simulation, formal checks, and CI-style validation.",
+      "context": "Used for FPGA and digital logic projects including FIR filters, asynchronous FIFOs, AES pipelines, and verification-focused hardware design.",
+      "tools": [
+        "Verilog",
+        "SystemVerilog",
+        "Vivado",
+        "cocotb",
+        "Verilator",
+        "SymbiYosys",
+        "GitHub Actions",
+        "Waveform debugging"
+      ]
+    }
+  ]
+}

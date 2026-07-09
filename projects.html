@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Projects | Kaung Myat Tun</title>
+<meta name="description" content="Electronics and AI project library across analog, digital, PCB, embedded, signal processing, power, and AI/ML work.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-page="projects">
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <a class="brand" href="index.html">
+      <span class="part-number">Kaung Myat Tun</span>
+      <span>Electronics Portfolio</span>
+    </a>
+    <nav class="tab-nav" aria-label="Primary portfolio pages">
+      <a class="nav-tab" href="index.html" data-page-link="overview">Overview</a>
+      <a class="nav-tab" href="skills.html" data-page-link="skills">Skills</a>
+      <a class="nav-tab" href="projects.html" data-page-link="projects">Projects</a>
+      <a class="nav-tab" href="experience.html" data-page-link="experience">Experience</a>
+      <a class="nav-tab" href="certificates.html" data-page-link="certificates">Certificates</a>
+      <a class="nav-tab" href="contact.html" data-page-link="contact">Contact</a>
+    </nav>
+    <div class="masthead-right">
+      <button type="button" class="theme-toggle" data-theme-toggle aria-pressed="false">Dark mode</button>
+      <a href="admin/">Admin</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="section page-intro">
+    <div class="section-label"><span class="section-num">01</span> Projects</div>
+    <h1>Project library</h1>
+    <p class="lede">Project pages grouped by general electronics sections, with space for AI/ML work as the portfolio grows.</p>
+  </section>
+
+  <section class="section">
+    <div class="project-toolbar">
+      <div class="project-tabs" aria-label="Project category filters">
+        <button class="project-tab active" type="button" data-project-filter="all" aria-pressed="true">All</button>
+        <button class="project-tab" type="button" data-project-filter="analog-ic" aria-pressed="false">Analog / IC</button>
+        <button class="project-tab" type="button" data-project-filter="digital-fpga" aria-pressed="false">Digital / FPGA</button>
+        <button class="project-tab" type="button" data-project-filter="pcb-hardware" aria-pressed="false">PCB / Hardware</button>
+        <button class="project-tab" type="button" data-project-filter="embedded-iot" aria-pressed="false">Embedded / IoT</button>
+        <button class="project-tab" type="button" data-project-filter="signal-processing" aria-pressed="false">Signal Processing</button>
+        <button class="project-tab" type="button" data-project-filter="sensors-instrumentation" aria-pressed="false">Sensors / Instrumentation</button>
+        <button class="project-tab" type="button" data-project-filter="robotics-control" aria-pressed="false">Robotics / Control</button>
+        <button class="project-tab" type="button" data-project-filter="rf-wireless" aria-pressed="false">RF / Wireless</button>
+        <button class="project-tab" type="button" data-project-filter="power-energy" aria-pressed="false">Power / Energy</button>
+        <button class="project-tab" type="button" data-project-filter="software-cpp" aria-pressed="false">Software / C++</button>
+        <button class="project-tab" type="button" data-project-filter="ai-ml" aria-pressed="false">AI / ML</button>
+      </div>
+      <div class="project-count" data-project-count>0 projects shown</div>
+    </div>
+    <div class="project-grid" data-project-grid></div>
+  </section>
+</main>
+
+<footer class="footer">
+  <span>&copy; 2026 Kaung Myat Tun.</span>
+  <span>Electronics, embedded systems, and intelligent sensing portfolio.</span>
+</footer>
+
+<script src="data.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
