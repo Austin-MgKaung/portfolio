@@ -15,8 +15,14 @@
 <header class="masthead">
   <div class="masthead-inner">
     <a class="brand" href="index.html">
-      <span class="part-number">Kaung Myat Tun</span>
-      <span>Electronics Portfolio</span>
+      <span class="brand-avatar">
+        <img class="profile-photo" src="" alt="" data-profile-photo hidden>
+        <span class="profile-photo-placeholder" data-profile-initials>KMT</span>
+      </span>
+      <span class="brand-text">
+        <span class="part-number">Kaung Myat Tun</span>
+        <span>Electronics Portfolio</span>
+      </span>
     </a>
     <nav class="tab-nav" aria-label="Primary portfolio pages">
       <a class="nav-tab" href="index.html" data-page-link="overview">Overview</a>
@@ -35,30 +41,35 @@
 
 <main>
   <section class="section page-intro">
-    <div class="section-label"><span class="section-num">01</span> Skills</div>
     <h1>Engineering capability map</h1>
     <p class="lede">A general electronics skill profile showing specialist lines, practical toolchains, and current proficiency from 1 to 5 bars.</p>
   </section>
 
   <section class="section">
-    <div class="section-label"><span class="section-num">02</span> Skill Map <span class="section-sub">(profile view)</span></div>
+    <h2>Skill Map</h2>
     <div data-skill-map></div>
   </section>
 
   <section class="section">
-    <div class="section-label"><span class="section-num">03</span> Tools &amp; Technologies <span class="section-sub">(toolchain view)</span></div>
+    <h2>Tools &amp; Technologies</h2>
     <div class="toolkit" data-toolkit></div>
   </section>
 
   <section class="section">
-    <div class="section-label"><span class="section-num">04</span> Skill Lines <span class="section-sub">(5-bar proficiency)</span></div>
+    <h2>Skill Lines</h2>
     <div class="skill-grid" data-skill-groups></div>
+  </section>
+
+  <section class="section">
+    <h2>GitHub Activity</h2>
+    <div data-github-activity></div>
   </section>
 </main>
 
 <footer class="footer">
   <span>&copy; 2026 Kaung Myat Tun.</span>
-  <span>Electronics, embedded systems, and intelligent sensing portfolio.</span>
+  <span>If it doesn't show up on the scope, it isn't done.</span>
+  <span class="footer-hint">// try typing "engineer"</span>
 </footer>
 
 <script src="data.js"></script>

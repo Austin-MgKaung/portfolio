@@ -50,6 +50,29 @@
       .join("") || "KMT";
   }
 
+  function githubUsername(profile) {
+    if (!profile || !profile.github) return "";
+    const match = String(profile.github).match(/github\.com\/([^/?#]+)/i);
+    return match ? match[1] : "";
+  }
+
+  function timeAgo(dateString) {
+    const seconds = Math.floor((Date.now() - new Date(dateString).getTime()) / 1000);
+    const units = [
+      ["year", 31536000],
+      ["month", 2592000],
+      ["week", 604800],
+      ["day", 86400],
+      ["hour", 3600],
+      ["minute", 60]
+    ];
+    for (const [name, secondsInUnit] of units) {
+      const value = Math.floor(seconds / secondsInUnit);
+      if (value >= 1) return `${value} ${name}${value > 1 ? "s" : ""} ago`;
+    }
+    return "just now";
+  }
+
   function normalizeProject(project) {
     return {
       id: project.id || `${slug(project.title)}-${Date.now()}`,
@@ -197,6 +220,83 @@
         applyTheme(next);
       });
     });
+  }
+
+  const ENGINEER_TRIGGER = "engineer";
+  const ENGINEER_KEY = "portfolio-engineer-mode";
+  let engineerKeyBuffer = "";
+
+  function ensureEngineerChrome() {
+    if (document.querySelector(".engineer-scanlines")) return;
+
+    const scanlines = document.createElement("div");
+    scanlines.className = "engineer-scanlines";
+    scanlines.setAttribute("aria-hidden", "true");
+    document.body.appendChild(scanlines);
+
+    const exitButton = document.createElement("button");
+    exitButton.type = "button";
+    exitButton.className = "engineer-exit";
+    exitButton.textContent = "Exit engineer mode";
+    exitButton.addEventListener("click", () => setEngineerMode(false));
+    document.body.appendChild(exitButton);
+  }
+
+  function playEngineerBootSequence() {
+    const lines = [
+      "[BOOT] initializing engineer mode...",
+      "[ OK ] loading kaung.portfolio...",
+      "[ OK ] mounting /dev/scope0",
+      "[ OK ] firmware signature verified",
+      "[READY] welcome, engineer."
+    ];
+
+    const overlay = document.createElement("div");
+    overlay.className = "engineer-boot-overlay";
+    overlay.setAttribute("aria-hidden", "true");
+    overlay.addEventListener("click", () => overlay.remove());
+    document.body.appendChild(overlay);
+
+    let index = 0;
+    function nextLine() {
+      if (index >= lines.length) {
+        setTimeout(() => overlay.remove(), 500);
+        return;
+      }
+      const line = document.createElement("p");
+      line.textContent = lines[index];
+      overlay.appendChild(line);
+      index += 1;
+      setTimeout(nextLine, 220);
+    }
+    nextLine();
+  }
+
+  function setEngineerMode(active, options) {
+    const silent = Boolean(options && options.silent);
+    if (active && !silent) playEngineerBootSequence();
+    document.documentElement.setAttribute("data-engineer-mode", String(active));
+    localStorage.setItem(ENGINEER_KEY, String(active));
+  }
+
+  function initEngineerMode() {
+    ensureEngineerChrome();
+
+    if (localStorage.getItem(ENGINEER_KEY) === "true") {
+      setEngineerMode(true, { silent: true });
+    }
+
+    document.addEventListener("keydown", event => {
+      if (event.key.length !== 1) return;
+      engineerKeyBuffer = (engineerKeyBuffer + event.key.toLowerCase()).slice(-ENGINEER_TRIGGER.length);
+      if (engineerKeyBuffer === ENGINEER_TRIGGER) {
+        const isActive = document.documentElement.getAttribute("data-engineer-mode") === "true";
+        setEngineerMode(!isActive);
+        engineerKeyBuffer = "";
+      }
+    });
+
+    console.log("%cpsst... try typing \"engineer\" anywhere on this page.", "color:#156F78;font-family:monospace;font-size:12px;");
   }
 
   function setActivePage() {
@@ -734,6 +834,11 @@
     const fill = document.querySelector("[data-live-wave-fill]");
     const barsGroup = document.querySelector("[data-spectrum-bars]");
     const readout = document.querySelector("[data-signal-readout]");
+    const nodes = Array.from(document.querySelectorAll("[data-system-node]"));
+    const quality = document.querySelector("[data-monitor-quality]");
+    const peak = document.querySelector("[data-monitor-peak]");
+    const packets = document.querySelector("[data-monitor-packets]");
+    const status = document.querySelector("[data-monitor-status]");
     if (!wave || !fill || !barsGroup) return;
 
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -794,6 +899,26 @@
       if (readout) {
         const frequency = Math.round(118 + Math.sin(t * 0.9) * 16 + Math.cos(t * 0.35) * 8);
         readout.textContent = `${frequency} Hz`;
+        if (peak) peak.textContent = `${frequency} Hz`;
+      }
+
+      if (quality) {
+        quality.textContent = `${Math.round(91 + Math.sin(t * 0.7) * 4)}%`;
+      }
+
+      if (packets) {
+        packets.textContent = `${Math.round(44 + Math.cos(t * 1.1) * 6)}/s`;
+      }
+
+      if (status) {
+        status.textContent = Math.sin(t * 1.6) > -0.72 ? "MQTT connected" : "syncing";
+      }
+
+      if (nodes.length) {
+        const activeIndex = Math.floor(t * 1.7) % nodes.length;
+        nodes.forEach((node, index) => {
+          node.classList.toggle("active", index === activeIndex);
+        });
       }
 
       if (!prefersReducedMotion) {
@@ -801,7 +926,23 @@
       }
     }
 
-    draw(0);
+    function drawAtRest() {
+      draw(0);
+      if (readout) readout.textContent = "128 Hz";
+      if (peak) peak.textContent = "128 Hz";
+      if (quality) quality.textContent = "92%";
+      if (packets) packets.textContent = "48/s";
+      if (status) status.textContent = "MQTT connected";
+      if (nodes.length) {
+        nodes.forEach((node, index) => node.classList.toggle("active", index === 0));
+      }
+    }
+
+    if (prefersReducedMotion) {
+      drawAtRest();
+    } else {
+      draw(0);
+    }
   }
 
   async function loadJson(path) {
@@ -832,11 +973,67 @@
     }
   }
 
+  async function renderGithubActivity() {
+    const target = document.querySelector("[data-github-activity]");
+    if (!target) return;
+
+    const profile = defaults.profile || {};
+    const username = githubUsername(profile);
+    if (!username) {
+      target.innerHTML = emptyState("GitHub not linked", "Add a GitHub URL in Admin to show live activity here.");
+      return;
+    }
+
+    try {
+      const [user, repos] = await Promise.all([
+        loadJson(`https://api.github.com/users/${username}`),
+        loadJson(`https://api.github.com/users/${username}/repos?sort=pushed&per_page=5`)
+      ]);
+
+      if (!user || !Array.isArray(repos)) throw new Error("GitHub data unavailable");
+
+      const stats = `
+        <div class="github-stats">
+          <span>${user.public_repos} public repos</span>
+          <span>${user.followers} followers</span>
+        </div>`;
+
+      const repoList = repos.length
+        ? `<div class="github-repo-list">${repos.map(repo => `
+            <article class="github-repo">
+              <div class="github-repo-head">
+                <a href="${escapeHtml(repo.html_url)}" target="_blank" rel="noopener">${escapeHtml(repo.name)}</a>
+                <span class="github-repo-updated">updated ${timeAgo(repo.pushed_at || repo.updated_at)}</span>
+              </div>
+              <p>${escapeHtml(repo.description || "No description yet.")}</p>
+              ${repo.language ? `<span class="github-repo-lang">${escapeHtml(repo.language)}</span>` : ""}
+            </article>`).join("")}</div>`
+        : "";
+
+      target.innerHTML = `
+        <div class="github-panel">
+          ${stats}
+          ${repoList}
+          <a class="inline-link" href="${escapeHtml(profile.github)}" target="_blank" rel="noopener">View full profile on GitHub</a>
+        </div>`;
+    } catch (error) {
+      target.innerHTML = emptyState("GitHub activity unavailable", "Rate-limited or offline right now.");
+      const link = document.createElement("a");
+      link.className = "inline-link";
+      link.href = profile.github;
+      link.target = "_blank";
+      link.rel = "noopener";
+      link.textContent = "View GitHub profile directly";
+      target.querySelector(".empty-state").appendChild(link);
+    }
+  }
+
   function renderSite() {
     setActivePage();
     renderFeaturedProjects();
     renderProjectGrid();
     renderSkills();
+    renderGithubActivity();
     renderOverviewTimeline();
     renderExperience();
     renderCertificates();
@@ -848,6 +1045,7 @@
 
   async function init() {
     initTheme();
+    initEngineerMode();
     await loadCmsContent();
     renderSite();
   }

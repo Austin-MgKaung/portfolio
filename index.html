@@ -15,8 +15,14 @@
 <header class="masthead">
   <div class="masthead-inner">
     <a class="brand" href="index.html">
-      <span class="part-number">Kaung Myat Tun</span>
-      <span>Electronics Portfolio</span>
+      <span class="brand-avatar">
+        <img class="profile-photo" src="" alt="" data-profile-photo hidden>
+        <span class="profile-photo-placeholder" data-profile-initials>KMT</span>
+      </span>
+      <span class="brand-text">
+        <span class="part-number">Kaung Myat Tun</span>
+        <span>Electronics Portfolio</span>
+      </span>
     </a>
     <nav class="tab-nav" aria-label="Primary portfolio pages">
       <a class="nav-tab" href="index.html" data-page-link="overview">Overview</a>
@@ -35,7 +41,6 @@
 
 <main>
   <section class="section section-hero">
-    <div class="section-label"><span class="section-num">01</span> Recruiter View</div>
     <div class="hero-grid">
       <div class="hero-copy">
         <h1 data-profile-name>Kaung Myat Tun</h1>
@@ -51,53 +56,111 @@
         </div>
       </div>
       <div class="hero-signal-card">
-        <div class="signal-profile-strip">
-          <div class="signal-avatar">
-            <img class="profile-photo" src="" alt="" data-profile-photo hidden>
-            <div class="profile-photo-placeholder" data-profile-initials>KMT</div>
-          </div>
+        <p class="sr-only">Simulated demo of an IIoT sensor telemetry pipeline: vibration sensor, analog front end, MCU firmware, MQTT, and a Grafana dashboard. The numbers and waveform shown are illustrative, not a live data feed.</p>
+        <div class="monitor-header">
           <div class="signal-profile-copy">
-            <span class="feature-tag">Engineering Profile</span>
+            <span class="feature-tag">Live Embedded System Monitor</span>
             <h2 data-profile-short-role>Electronics &amp; Embedded Systems Engineer</h2>
-            <p data-profile-location>Sheffield, UK</p>
+            <p><span data-profile-location>Sheffield, UK</span> / sensor node demo</p>
+          </div>
+          <div class="monitor-status">
+            <span class="status-dot"></span>
+            <span data-monitor-status>MQTT connected</span>
           </div>
         </div>
 
-        <div class="signal-panel">
-          <div class="signal-panel-head">
-            <span>Live Signal Analysis / FFT</span>
-            <span data-signal-readout>128 Hz</span>
+        <div class="system-flow" aria-label="Embedded data pipeline">
+          <div class="system-node active" data-system-node>
+            <span>01</span>
+            <strong>Sensor</strong>
+            <em>vibration</em>
           </div>
-          <svg class="signal-visual" viewBox="0 0 520 300" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Animated signal waveform and frequency spectrum">
-            <defs>
-              <pattern id="signal-grid" width="26" height="26" patternUnits="userSpaceOnUse">
-                <path d="M 26 0 L 0 0 0 26" fill="none" stroke="var(--line)" stroke-width="1"/>
-              </pattern>
-              <linearGradient id="signal-fill" x1="0" x2="1" y1="0" y2="0">
-                <stop offset="0%" stop-color="var(--teal)"/>
-                <stop offset="100%" stop-color="var(--accent)"/>
-              </linearGradient>
-            </defs>
-            <rect width="520" height="300" rx="8" fill="var(--scope-bg)"/>
-            <rect width="520" height="300" rx="8" fill="url(#signal-grid)"/>
-            <line x1="24" y1="118" x2="496" y2="118" stroke="var(--line-strong)" stroke-width="1"/>
-            <line x1="24" y1="242" x2="496" y2="242" stroke="var(--line-strong)" stroke-width="1"/>
-            <path class="live-wave-fill" data-live-wave-fill d=""/>
-            <path class="live-wave" data-live-wave d=""/>
-            <g data-spectrum-bars></g>
-          </svg>
-          <div class="signal-metrics">
-            <span>Sensor waveform</span>
-            <span>Frequency peaks</span>
-            <span>Live update</span>
+          <div class="system-node" data-system-node>
+            <span>02</span>
+            <strong>AFE</strong>
+            <em>filter + ADC</em>
+          </div>
+          <div class="system-node" data-system-node>
+            <span>03</span>
+            <strong>MCU</strong>
+            <em>firmware</em>
+          </div>
+          <div class="system-node" data-system-node>
+            <span>04</span>
+            <strong>MQTT</strong>
+            <em>telemetry</em>
+          </div>
+          <div class="system-node" data-system-node>
+            <span>05</span>
+            <strong>Grafana</strong>
+            <em>dashboard</em>
           </div>
         </div>
+
+        <div class="monitor-grid">
+          <div class="telemetry-panel">
+            <div class="telemetry-row">
+              <span>Signal quality</span>
+              <strong data-monitor-quality>92%</strong>
+            </div>
+            <div class="telemetry-row">
+              <span>Vibration peak</span>
+              <strong data-monitor-peak>128 Hz</strong>
+            </div>
+            <div class="telemetry-row">
+              <span>Packet rate</span>
+              <strong data-monitor-packets>48/s</strong>
+            </div>
+            <div class="telemetry-row">
+              <span>Pipeline</span>
+              <strong>Python + Docker</strong>
+            </div>
+          </div>
+
+          <div class="signal-panel">
+            <div class="signal-panel-head">
+              <span>Waveform + FFT</span>
+              <span data-signal-readout>128 Hz</span>
+            </div>
+            <svg class="signal-visual" viewBox="0 0 520 300" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Animated sensor waveform and frequency spectrum">
+              <defs>
+                <pattern id="signal-grid" width="26" height="26" patternUnits="userSpaceOnUse">
+                  <path d="M 26 0 L 0 0 0 26" fill="none" stroke="var(--line)" stroke-width="1"/>
+                </pattern>
+                <linearGradient id="signal-fill" x1="0" x2="1" y1="0" y2="0">
+                  <stop offset="0%" stop-color="var(--teal)"/>
+                  <stop offset="100%" stop-color="var(--accent)"/>
+                </linearGradient>
+              </defs>
+              <rect width="520" height="300" rx="8" fill="var(--scope-bg)"/>
+              <rect width="520" height="300" rx="8" fill="url(#signal-grid)"/>
+              <line x1="24" y1="118" x2="496" y2="118" stroke="var(--line-strong)" stroke-width="1"/>
+              <line x1="24" y1="242" x2="496" y2="242" stroke="var(--line-strong)" stroke-width="1"/>
+              <path class="live-wave-fill" data-live-wave-fill d=""/>
+              <path class="live-wave" data-live-wave d=""/>
+              <g data-spectrum-bars></g>
+            </svg>
+            <div class="signal-metrics">
+              <span>Sensor waveform</span>
+              <span>Frequency peaks</span>
+              <span>Live update</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="monitor-stack">
+          <span>C / C++ firmware</span>
+          <span>nRF / STM32</span>
+          <span>MQTT</span>
+          <span>Grafana</span>
+        </div>
+        <p class="table-footnote">Simulated telemetry — an illustrative pipeline demo, not a live data feed.</p>
       </div>
     </div>
   </section>
 
   <section class="section section-compact">
-    <div class="section-label"><span class="section-num">02</span> Proof Snapshot</div>
+    <h2>Proof Snapshot</h2>
     <div class="proof-strip">
       <article class="proof-item">
         <span class="proof-value">12 mo</span>
@@ -123,7 +186,7 @@
   </section>
 
   <section class="section section-compact">
-    <div class="section-label"><span class="section-num">03</span> Focus Areas</div>
+    <h2>Focus Areas</h2>
     <div class="metrics-grid">
       <article class="metric">
         <span class="metric-value">Embedded</span>
@@ -147,7 +210,6 @@
   <section class="section">
     <div class="section-head">
       <div>
-        <div class="section-label"><span class="section-num">04</span> Timeline</div>
         <h2>Recent engineering path</h2>
       </div>
       <a class="inline-link" href="experience.html">Full experience</a>
@@ -159,7 +221,7 @@
   <section class="section">
     <div class="section-head">
       <div>
-        <div class="section-label"><span class="section-num">05</span> Featured Projects</div>
+        <h2>Featured Projects</h2>
       </div>
       <a class="inline-link" href="projects.html">All projects</a>
     </div>
@@ -169,7 +231,8 @@
 
 <footer class="footer">
   <span>&copy; 2026 Kaung Myat Tun.</span>
-  <span>Electronics, embedded systems, and intelligent sensing portfolio.</span>
+  <span>If it doesn't show up on the scope, it isn't done.</span>
+  <span class="footer-hint">// try typing "engineer"</span>
 </footer>
 
 <script src="data.js"></script>
