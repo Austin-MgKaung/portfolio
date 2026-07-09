@@ -1,16 +1,15 @@
 # Decap CMS configuration.
-# Before publishing, replace YOUR-GITHUB-USERNAME/YOUR-REPO-NAME below.
+# Auth is handled by Netlify Identity + Git Gateway (set up in the Netlify
+# dashboard) -- no repo or OAuth app needed here.
 backend:
-  name: github
-  repo: YOUR-GITHUB-USERNAME/YOUR-REPO-NAME
+  name: git-gateway
   branch: main
-  use_graphql: true
 
 media_folder: "assets/uploads"
 public_folder: "assets/uploads"
 
-site_url: "https://YOUR-GITHUB-USERNAME.github.io/YOUR-REPO-NAME"
-display_url: "https://YOUR-GITHUB-USERNAME.github.io/YOUR-REPO-NAME"
+site_url: "https://kaungmyattun.netlify.app"
+display_url: "https://kaungmyattun.netlify.app"
 publish_mode: simple
 
 collections:
@@ -73,6 +72,8 @@ collections:
               - { label: "Role", name: "role", widget: "string" }
               - { label: "Short Role", name: "shortRole", widget: "string", required: false }
               - { label: "Summary", name: "summary", widget: "text" }
+              - { label: "Why (hero tagline)", name: "why", widget: "text", required: false, hint: "One sentence on why you do this work. Shown under the summary on the Overview hero." }
+              - { label: "Next Focus (timeline closing note)", name: "nextFocus", widget: "text", required: false, hint: "Where you're headed next. Shown after the Timeline sections on Overview and Experience." }
               - { label: "Profile Photo", name: "photo", widget: "image", required: false }
               - { label: "Profile Photo Alt Text", name: "photoAlt", widget: "string", required: false }
               - { label: "Location", name: "location", widget: "string" }
