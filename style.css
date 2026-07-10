@@ -256,12 +256,15 @@ select:focus-visible {
   border-radius: 999px;
   display: grid;
   flex: 0 0 auto;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
   overflow: hidden;
   place-items: center;
   width: 34px;
 }
 
 .brand-avatar .profile-photo {
+  grid-area: 1 / 1;
   height: 100%;
   object-fit: cover;
   width: 100%;
@@ -271,6 +274,7 @@ select:focus-visible {
   border-color: rgba(255, 255, 255, 0.34);
   color: var(--panel-ink);
   font-size: 0.7rem;
+  grid-area: 1 / 1;
   height: 100%;
   width: 100%;
 }
@@ -399,6 +403,8 @@ h1 {
   border-radius: 18px;
   display: grid;
   flex: 0 0 auto;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
   overflow: hidden;
   place-items: center;
   position: relative;
@@ -406,6 +412,7 @@ h1 {
 }
 
 .hero-avatar .profile-photo {
+  grid-area: 1 / 1;
   height: 100%;
   object-fit: cover;
   width: 100%;
@@ -416,6 +423,7 @@ h1 {
   border-radius: 14px;
   color: var(--panel-ink);
   font-size: 1.7rem;
+  grid-area: 1 / 1;
   height: 100%;
   width: 100%;
 }
@@ -2062,12 +2070,15 @@ h3 {
   border: 1px solid rgba(255, 255, 255, 0.24);
   border-radius: 8px;
   display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
   overflow: hidden;
   place-items: center;
   position: relative;
 }
 
 .contact-photo .profile-photo {
+  grid-area: 1 / 1;
   height: 100%;
   object-fit: cover;
   width: 100%;
@@ -2076,6 +2087,7 @@ h3 {
 .contact-photo .profile-photo-placeholder {
   border-color: rgba(255, 255, 255, 0.34);
   color: var(--panel-ink);
+  grid-area: 1 / 1;
 }
 
 .photo-upload-btn {
