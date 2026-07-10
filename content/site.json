@@ -118,15 +118,51 @@
     }
   ],
   "skillMap": [
-    { "label": "Analog / IC", "value": 4 },
-    { "label": "Digital / FPGA", "value": 4 },
-    { "label": "PCB / Hardware", "value": 4 },
-    { "label": "Embedded", "value": 3 },
-    { "label": "AI / ML", "value": 2 },
-    { "label": "Software / C++", "value": 3 },
-    { "label": "Lab", "value": 4 }
+    {
+      "label": "Analog / IC",
+      "value": 4
+    },
+    {
+      "label": "Digital / FPGA",
+      "value": 4
+    },
+    {
+      "label": "PCB / Hardware",
+      "value": 4
+    },
+    {
+      "label": "Embedded",
+      "value": 3
+    },
+    {
+      "label": "AI / ML",
+      "value": 2
+    },
+    {
+      "label": "Software / C++",
+      "value": 3
+    },
+    {
+      "label": "Lab",
+      "value": 4
+    }
   ],
   "projects": [
+    {
+      "id": "project-1783642790580",
+      "partNumber": "",
+      "title": "New projecthjghjghj",
+      "category": "sensors-instrumentation",
+      "status": "Draft",
+      "stack": "hgjfhfghjghjsrtytrjghhgfjhf",
+      "summary": "Add a summary...ghjhgjghj",
+      "details": "hgjfgjgh",
+      "image": "ghfjfghj",
+      "imageAlt": "New projectjfghjgh preview",
+      "linkLabel": "fghjfghjgh",
+      "linkUrl": "jghjgfj",
+      "featured": false
+    },
     {
       "id": "axon-hillock",
       "partNumber": "AH-SKY130-01",
