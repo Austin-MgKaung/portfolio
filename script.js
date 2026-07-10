@@ -371,10 +371,268 @@
     }
 
     tabs.forEach(tab => {
+      if (tab.dataset.filterWired) return;
+      tab.dataset.filterWired = "true";
       tab.addEventListener("click", () => update(tab.dataset.projectFilter));
     });
 
     update("all");
+  }
+
+  const PROJECT_CATEGORY_OPTIONS = [
+    ["analog-ic", "Analog / IC"],
+    ["digital-fpga", "Digital / FPGA"],
+    ["pcb-hardware", "PCB / Hardware"],
+    ["embedded-iot", "Embedded / IoT"],
+    ["signal-processing", "Signal Processing"],
+    ["sensors-instrumentation", "Sensors / Instrumentation"],
+    ["robotics-control", "Robotics / Control"],
+    ["rf-wireless", "RF / Wireless"],
+    ["power-energy", "Power / Energy"],
+    ["software-cpp", "Software / C++"],
+    ["ai-ml", "AI / ML"]
+  ];
+
+  const GIT_GATEWAY_BASE = "/.netlify/git/github";
+  const SITE_JSON_PATH = "content/site.json";
+  let projectEditActive = false;
+
+  function utf8ToBase64(str) {
+    return btoa(unescape(encodeURIComponent(str)));
+  }
+
+  function base64ToUtf8(str) {
+    return decodeURIComponent(escape(atob(str.replace(/\n/g, ""))));
+  }
+
+  function currentIdentityUser() {
+    return window.netlifyIdentity ? window.netlifyIdentity.currentUser() : null;
+  }
+
+  async function fetchSiteJsonFromGateway() {
+    const user = currentIdentityUser();
+    if (!user) throw new Error("Not logged in.");
+    const token = await user.jwt();
+    const response = await fetch(`${GIT_GATEWAY_BASE}/contents/${SITE_JSON_PATH}?ref=main`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!response.ok) throw new Error(`Could not load ${SITE_JSON_PATH} (HTTP ${response.status}).`);
+    const data = await response.json();
+    return { sha: data.sha, site: JSON.parse(base64ToUtf8(data.content)) };
+  }
+
+  async function saveProjectsToGateway(projects) {
+    const user = currentIdentityUser();
+    if (!user) throw new Error("Not logged in.");
+    const token = await user.jwt();
+    const { sha, site } = await fetchSiteJsonFromGateway();
+    const updatedSite = Object.assign({}, site, { projects });
+    const body = {
+      message: "Update projects via inline editor",
+      content: utf8ToBase64(JSON.stringify(updatedSite, null, 2)),
+      sha,
+      branch: "main"
+    };
+    const response = await fetch(`${GIT_GATEWAY_BASE}/contents/${SITE_JSON_PATH}`, {
+      method: "PUT",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => "");
+      throw new Error(`Save failed (HTTP ${response.status}). ${errorText}`);
+    }
+  }
+
+  function blankProject() {
+    return normalizeProject({
+      id: `project-${Date.now()}`,
+      title: "New project",
+      category: "analog-ic",
+      status: "Draft",
+      summary: "Add a summary...",
+      featured: false
+    });
+  }
+
+  function categorySelectHtml(project) {
+    return `
+      <select class="project-category-select" data-field="category">
+        ${PROJECT_CATEGORY_OPTIONS.map(([value, label]) =>
+          `<option value="${value}" ${project.category === value ? "selected" : ""}>${escapeHtml(label)}</option>`
+        ).join("")}
+      </select>`;
+  }
+
+  function projectEditCard(project) {
+    return `
+      <article class="project-card project-card-editable" data-project-edit-card data-id="${escapeHtml(project.id)}">
+        <button type="button" class="project-remove-btn" data-project-remove aria-label="Remove project">&times;</button>
+        <img class="project-image" src="${projectImage(project)}" alt="${escapeHtml(project.imageAlt || project.title)}">
+        <div class="project-card-body">
+          <div class="project-meta">
+            <span class="editable-field" contenteditable="true" data-field="partNumber">${escapeHtml(project.partNumber)}</span>
+            ${categorySelectHtml(project)}
+          </div>
+          <h2 class="editable-field" contenteditable="true" data-field="title">${escapeHtml(project.title)}</h2>
+          <p class="editable-field" contenteditable="true" data-field="summary">${escapeHtml(project.summary)}</p>
+          <div class="project-card-foot">
+            <span class="editable-field status-pill" contenteditable="true" data-field="status">${escapeHtml(project.status)}</span>
+            <label class="project-featured-toggle">
+              <input type="checkbox" data-field="featured" ${project.featured ? "checked" : ""}> Featured
+            </label>
+          </div>
+          <details class="project-edit-extra">
+            <summary>More fields</summary>
+            <label>Stack <input type="text" data-field="stack" value="${escapeHtml(project.stack)}"></label>
+            <label>Details <textarea data-field="details">${escapeHtml(project.details)}</textarea></label>
+            <label>Image URL <input type="text" data-field="image" value="${escapeHtml(project.image)}"></label>
+            <label>Image alt text <input type="text" data-field="imageAlt" value="${escapeHtml(project.imageAlt)}"></label>
+            <label>Link label <input type="text" data-field="linkLabel" value="${escapeHtml(project.linkLabel)}"></label>
+            <label>Link URL <input type="text" data-field="linkUrl" value="${escapeHtml(project.linkUrl)}"></label>
+          </details>
+        </div>
+      </article>`;
+  }
+
+  function collectEditedProjects() {
+    const cards = Array.from(document.querySelectorAll("[data-project-edit-card]"));
+    return cards.map(card => {
+      const field = name => card.querySelector(`[data-field="${name}"]`);
+      const text = name => {
+        const el = field(name);
+        return el ? el.textContent.trim() : "";
+      };
+      const value = name => {
+        const el = field(name);
+        return el ? el.value.trim() : "";
+      };
+      return normalizeProject({
+        id: card.dataset.id,
+        partNumber: text("partNumber"),
+        title: text("title"),
+        category: value("category"),
+        status: text("status"),
+        stack: value("stack"),
+        summary: text("summary"),
+        details: value("details"),
+        image: value("image"),
+        imageAlt: value("imageAlt"),
+        linkLabel: value("linkLabel"),
+        linkUrl: value("linkUrl"),
+        featured: Boolean(field("featured") && field("featured").checked)
+      });
+    });
+  }
+
+  function renderProjectEditGrid() {
+    const target = document.querySelector("[data-project-grid]");
+    if (!target) return;
+    target.innerHTML = getProjects().map(projectEditCard).join("");
+  }
+
+  function setProjectEditStatus(message, isError) {
+    const status = document.querySelector("[data-project-edit-status]");
+    if (!status) return;
+    status.textContent = message || "";
+    status.classList.toggle("is-error", Boolean(isError));
+  }
+
+  function enterProjectEditMode() {
+    projectEditActive = true;
+    document.querySelector("[data-project-toolbar]")?.setAttribute("hidden", "");
+    document.querySelector("[data-project-edit-bar]")?.removeAttribute("hidden");
+    document.querySelector("[data-project-edit-entry]")?.setAttribute("hidden", "");
+    setProjectEditStatus("Editing -- changes are not saved until you click Save.");
+    renderProjectEditGrid();
+  }
+
+  function exitProjectEditMode() {
+    projectEditActive = false;
+    document.querySelector("[data-project-toolbar]")?.removeAttribute("hidden");
+    document.querySelector("[data-project-edit-bar]")?.setAttribute("hidden", "");
+    if (currentIdentityUser()) {
+      document.querySelector("[data-project-edit-entry]")?.removeAttribute("hidden");
+    }
+    renderProjectGrid();
+  }
+
+  async function saveProjectEdits() {
+    setProjectEditStatus("Saving...");
+    try {
+      const projects = collectEditedProjects();
+      await saveProjectsToGateway(projects);
+      defaults.projects = projects;
+      setProjectEditStatus("Saved. Redeploying on Netlify now -- live in a minute or so.");
+      setTimeout(() => exitProjectEditMode(), 1200);
+    } catch (error) {
+      setProjectEditStatus(error.message || "Save failed.", true);
+    }
+  }
+
+  function ensureProjectEditorChrome() {
+    const toolbar = document.querySelector(".project-toolbar");
+    if (!toolbar || document.querySelector("[data-project-edit-entry]")) return;
+    toolbar.setAttribute("data-project-toolbar", "");
+
+    const entryButton = document.createElement("button");
+    entryButton.type = "button";
+    entryButton.className = "btn btn-small btn-ghost project-edit-entry";
+    entryButton.setAttribute("data-project-edit-entry", "");
+    entryButton.textContent = "Edit projects";
+    entryButton.hidden = true;
+    entryButton.addEventListener("click", enterProjectEditMode);
+    toolbar.insertAdjacentElement("beforebegin", entryButton);
+
+    const bar = document.createElement("div");
+    bar.className = "project-edit-bar";
+    bar.setAttribute("data-project-edit-bar", "");
+    bar.hidden = true;
+    bar.innerHTML = `
+      <span class="project-edit-status" data-project-edit-status></span>
+      <div class="project-edit-actions">
+        <button type="button" class="btn btn-small btn-ghost" data-project-add>+ Add project</button>
+        <button type="button" class="btn btn-small btn-primary" data-project-save>Save changes</button>
+        <button type="button" class="btn btn-small btn-ghost" data-project-exit-edit>Exit without saving</button>
+      </div>`;
+    toolbar.insertAdjacentElement("beforebegin", bar);
+
+    bar.querySelector("[data-project-save]").addEventListener("click", saveProjectEdits);
+    bar.querySelector("[data-project-exit-edit]").addEventListener("click", exitProjectEditMode);
+    bar.querySelector("[data-project-add]").addEventListener("click", () => {
+      const grid = document.querySelector("[data-project-grid]");
+      if (!grid) return;
+      grid.insertAdjacentHTML("afterbegin", projectEditCard(blankProject()));
+      const newCard = grid.querySelector("[data-project-edit-card]");
+      newCard.querySelector('[data-field="title"]')?.focus();
+    });
+
+    document.addEventListener("click", event => {
+      if (event.target.closest("[data-project-remove]")) {
+        event.target.closest("[data-project-edit-card]")?.remove();
+      }
+    });
+  }
+
+  function initProjectEditor() {
+    if (!document.querySelector("[data-project-grid]")) return;
+    if (!window.netlifyIdentity) return;
+
+    function refreshEntryVisibility() {
+      const entry = document.querySelector("[data-project-edit-entry]");
+      if (!entry || projectEditActive) return;
+      entry.hidden = !currentIdentityUser();
+    }
+
+    window.netlifyIdentity.on("init", () => {
+      ensureProjectEditorChrome();
+      refreshEntryVisibility();
+    });
+    window.netlifyIdentity.on("login", refreshEntryVisibility);
+    window.netlifyIdentity.on("logout", () => {
+      if (projectEditActive) exitProjectEditMode();
+      refreshEntryVisibility();
+    });
   }
 
   function skillLevel(value) {
@@ -1048,6 +1306,7 @@
     initEngineerMode();
     await loadCmsContent();
     renderSite();
+    initProjectEditor();
   }
 
   init();
