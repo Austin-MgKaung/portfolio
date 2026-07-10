@@ -146,6 +146,20 @@ body {
   transition: background-color 0.15s ease, color 0.15s ease;
 }
 
+/* Smooth cross-fade between full page navigations (Overview -> Skills ->
+   Projects etc.) on browsers that support it. No JS, no SPA rewrite --
+   unsupported browsers just get the normal instant navigation, same as
+   before. */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.22s;
+  animation-timing-function: ease;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -2562,5 +2576,10 @@ h3 {
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
   }
 }
