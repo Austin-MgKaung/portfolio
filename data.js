@@ -409,11 +409,11 @@ window.PORTFOLIO_DEFAULTS = {
   ],
   education: [
     {
-      period: "PLACEHOLDER - EDIT ME: e.g. 2022 - 2026",
-      title: "PLACEHOLDER - EDIT ME: University name",
-      tag: "PLACEHOLDER - EDIT ME: Degree title, e.g. BEng Electronic Engineering",
-      place: "PLACEHOLDER - EDIT ME: City, UK",
-      summary: "PLACEHOLDER - EDIT ME: one sentence on focus/modules/standing.",
+      period: "2022 - 2026",
+      title: "University of Sheffield",
+      tag: "MEng Electrical and Electronic Engineering (First Class Honours), with an Industrial Placement Year",
+      place: "Sheffield, UK",
+      summary: "Master's degree in electrical and electronic engineering, including a one-year industrial placement integrated into the course.",
       details: "",
       highlights: [],
       image: "",
