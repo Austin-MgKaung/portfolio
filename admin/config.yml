@@ -18,30 +18,23 @@ collections:
     format: "json"
     files:
       - name: "skills"
-        label: "Skills + Skill Map"
+        label: "Skills"
         file: "content/skills.json"
         fields:
           - label: "Skill Lines"
             name: "skills"
             widget: "list"
             summary: "{{fields.group}}"
+            hint: "The Skill Map radar chart on the Skills page is generated automatically from these -- no separate field to keep in sync."
             fields:
               - { label: "Skill Group", name: "group", widget: "string" }
               - { label: "Summary", name: "summary", widget: "text" }
-              - { label: "Level", name: "level", widget: "number", value_type: "int", min: 1, max: 5, hint: "1 to 5 bars." }
+              - { label: "Level", name: "level", widget: "number", value_type: "int", min: 1, max: 5, hint: "1 to 5 bars. Also drives this group's position on the Skill Map radar." }
               - { label: "Focus Label", name: "focus", widget: "string", required: false, hint: "For example: Specialist line, Strong line, Growing line." }
               - label: "Skill Items"
                 name: "items"
                 widget: "list"
                 field: { label: "Item", name: "item", widget: "string" }
-
-          - label: "Skill Map"
-            name: "skillMap"
-            widget: "list"
-            summary: "{{fields.label}}"
-            fields:
-              - { label: "Label", name: "label", widget: "string" }
-              - { label: "Value", name: "value", widget: "number", value_type: "int", min: 1, max: 5, hint: "1 to 5 on the radar chart." }
 
           - label: "Tools & Technologies"
             name: "toolGroups"

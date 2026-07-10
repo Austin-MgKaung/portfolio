@@ -395,7 +395,9 @@
 
   const GIT_GATEWAY_BASE = "/.netlify/git/github";
   const SITE_JSON_PATH = "content/site.json";
+  const SKILLS_JSON_PATH = "content/skills.json";
   let projectEditActive = false;
+  let skillEditActive = false;
 
   function utf8ToBase64(str) {
     return btoa(unescape(encodeURIComponent(str)));
@@ -457,31 +459,31 @@
     });
   }
 
-  async function fetchSiteJsonFromGateway() {
+  async function fetchJsonFromGateway(path) {
     const user = currentIdentityUser();
     if (!user) throw new Error("Not logged in.");
     const token = await user.jwt();
-    const response = await fetch(`${GIT_GATEWAY_BASE}/contents/${SITE_JSON_PATH}?ref=main`, {
+    const response = await fetch(`${GIT_GATEWAY_BASE}/contents/${path}?ref=main`, {
       headers: { Authorization: `Bearer ${token}` }
     });
-    if (!response.ok) throw new Error(`Could not load ${SITE_JSON_PATH} (HTTP ${response.status}).`);
+    if (!response.ok) throw new Error(`Could not load ${path} (HTTP ${response.status}).`);
     const data = await response.json();
-    return { sha: data.sha, site: JSON.parse(base64ToUtf8(data.content)) };
+    return { sha: data.sha, json: JSON.parse(base64ToUtf8(data.content)) };
   }
 
-  async function saveSiteFieldToGateway(fieldName, value, commitMessage) {
+  async function saveFieldToGateway(path, fieldName, value, commitMessage) {
     const user = currentIdentityUser();
     if (!user) throw new Error("Not logged in.");
     const token = await user.jwt();
-    const { sha, site } = await fetchSiteJsonFromGateway();
-    const updatedSite = Object.assign({}, site, { [fieldName]: value });
+    const { sha, json } = await fetchJsonFromGateway(path);
+    const updated = Object.assign({}, json, { [fieldName]: value });
     const body = {
       message: commitMessage || `Update ${fieldName} via inline editor`,
-      content: utf8ToBase64(JSON.stringify(updatedSite, null, 2)),
+      content: utf8ToBase64(JSON.stringify(updated, null, 2)),
       sha,
       branch: "main"
     };
-    const response = await fetch(`${GIT_GATEWAY_BASE}/contents/${SITE_JSON_PATH}`, {
+    const response = await fetch(`${GIT_GATEWAY_BASE}/contents/${path}`, {
       method: "PUT",
       headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       body: JSON.stringify(body)
@@ -490,6 +492,14 @@
       const errorText = await response.text().catch(() => "");
       throw new Error(`Save failed (HTTP ${response.status}). ${errorText}`);
     }
+  }
+
+  function saveSiteFieldToGateway(fieldName, value, commitMessage) {
+    return saveFieldToGateway(SITE_JSON_PATH, fieldName, value, commitMessage);
+  }
+
+  function saveSkillsFieldToGateway(fieldName, value, commitMessage) {
+    return saveFieldToGateway(SKILLS_JSON_PATH, fieldName, value, commitMessage);
   }
 
   function blankProject() {
@@ -881,6 +891,207 @@
     });
   }
 
+  function editableSkillMeterHtml(level) {
+    const value = skillLevel(level);
+    return `
+      <div class="skill-meter skill-meter-editable" data-skill-level="${value}">
+        ${[1, 2, 3, 4, 5].map(step => `<span class="${step <= value ? "filled" : ""}" data-level-step="${step}"></span>`).join("")}
+      </div>`;
+  }
+
+  function skillItemEditRow(item) {
+    return `
+      <li class="skill-item-edit">
+        <span class="editable-field" contenteditable="true" data-skill-item>${escapeHtml(item)}</span>
+        <button type="button" class="skill-item-remove" data-skill-item-remove aria-label="Remove item">&times;</button>
+      </li>`;
+  }
+
+  function blankSkill() {
+    return { group: "New skill line", summary: "Add a summary...", level: 3, focus: "Growing line", items: [] };
+  }
+
+  function skillEditCard(skill) {
+    return `
+      <article class="skill-card skill-card-editable" data-skill-edit-card>
+        <button type="button" class="project-remove-btn" data-skill-remove aria-label="Remove skill group">&times;</button>
+        <div class="skill-card-head">
+          <div>
+            <span class="editable-field feature-tag" contenteditable="true" data-field="focus">${escapeHtml(skill.focus || "")}</span>
+            <h2 class="editable-field" contenteditable="true" data-field="group">${escapeHtml(skillTitle(skill))}</h2>
+          </div>
+          ${editableSkillMeterHtml(skill.level)}
+        </div>
+        <p class="editable-field" contenteditable="true" data-field="summary">${escapeHtml(skillSummary(skill))}</p>
+        <ul class="skill-list-edit" data-skill-items>
+          ${skillItems(skill).map(skillItemEditRow).join("")}
+        </ul>
+        <button type="button" class="btn btn-small btn-ghost" data-skill-item-add>+ Add technology</button>
+      </article>`;
+  }
+
+  function collectEditedSkills() {
+    const cards = Array.from(document.querySelectorAll("[data-skill-edit-card]"));
+    return cards.map(card => {
+      const field = name => card.querySelector(`[data-field="${name}"]`);
+      const text = name => {
+        const el = field(name);
+        return el ? el.textContent.trim() : "";
+      };
+      const meter = card.querySelector(".skill-meter-editable");
+      const level = meter ? Number(meter.dataset.skillLevel) || 0 : 0;
+      const items = Array.from(card.querySelectorAll("[data-skill-item]"))
+        .map(el => el.textContent.trim())
+        .filter(Boolean);
+      return {
+        group: text("group") || "New skill line",
+        summary: text("summary"),
+        level: skillLevel(level),
+        focus: text("focus"),
+        items
+      };
+    });
+  }
+
+  function renderSkillEditGrid() {
+    const target = document.querySelector("[data-skill-groups]");
+    if (!target) return;
+    target.innerHTML = (defaults.skills || []).map(skillEditCard).join("");
+  }
+
+  function setSkillEditStatus(message, isError) {
+    const status = document.querySelector("[data-skill-edit-status]");
+    if (!status) return;
+    status.textContent = message || "";
+    status.classList.toggle("is-error", Boolean(isError));
+  }
+
+  function enterSkillEditMode() {
+    skillEditActive = true;
+    document.querySelector("[data-skill-edit-bar]")?.removeAttribute("hidden");
+    document.querySelector("[data-skill-edit-entry]")?.setAttribute("hidden", "");
+    setSkillEditStatus("Editing -- the Skill Map radar updates from this automatically. Not saved until you click Save.");
+    renderSkillEditGrid();
+  }
+
+  function exitSkillEditMode() {
+    skillEditActive = false;
+    document.querySelector("[data-skill-edit-bar]")?.setAttribute("hidden", "");
+    if (currentIdentityUser()) {
+      document.querySelector("[data-skill-edit-entry]")?.removeAttribute("hidden");
+    }
+    renderSkills();
+  }
+
+  async function saveSkillEdits() {
+    setSkillEditStatus("Saving...");
+    try {
+      const skills = collectEditedSkills();
+      await saveSkillsFieldToGateway("skills", skills, "Update skill lines via inline editor");
+      defaults.skills = skills;
+      setSkillEditStatus("Saved. Redeploying on Netlify now -- live in a minute or so.");
+      setTimeout(() => exitSkillEditMode(), 1200);
+    } catch (error) {
+      setSkillEditStatus(error.message || "Save failed.", true);
+    }
+  }
+
+  function ensureSkillEditorChrome() {
+    const groups = document.querySelector("[data-skill-groups]");
+    if (!groups || document.querySelector("[data-skill-edit-entry]")) return;
+
+    const entryButton = document.createElement("button");
+    entryButton.type = "button";
+    entryButton.className = "btn btn-small btn-ghost project-edit-entry";
+    entryButton.setAttribute("data-skill-edit-entry", "");
+    entryButton.textContent = "Edit skill lines";
+    entryButton.hidden = true;
+    entryButton.addEventListener("click", enterSkillEditMode);
+    groups.insertAdjacentElement("beforebegin", entryButton);
+
+    const loginButton = document.createElement("button");
+    loginButton.type = "button";
+    loginButton.className = "btn btn-small btn-ghost project-edit-login";
+    loginButton.setAttribute("data-skill-edit-login", "");
+    loginButton.textContent = "Login to edit";
+    loginButton.hidden = true;
+    loginButton.addEventListener("click", () => window.netlifyIdentity.open("login"));
+    groups.insertAdjacentElement("beforebegin", loginButton);
+
+    const bar = document.createElement("div");
+    bar.className = "project-edit-bar";
+    bar.setAttribute("data-skill-edit-bar", "");
+    bar.hidden = true;
+    bar.innerHTML = `
+      <span class="project-edit-status" data-skill-edit-status></span>
+      <div class="project-edit-actions">
+        <button type="button" class="btn btn-small btn-ghost" data-skill-group-add>+ Add skill group</button>
+        <button type="button" class="btn btn-small btn-primary" data-skill-save>Save changes</button>
+        <button type="button" class="btn btn-small btn-ghost" data-skill-exit-edit>Exit without saving</button>
+      </div>`;
+    groups.insertAdjacentElement("beforebegin", bar);
+
+    bar.querySelector("[data-skill-save]").addEventListener("click", saveSkillEdits);
+    bar.querySelector("[data-skill-exit-edit]").addEventListener("click", exitSkillEditMode);
+    bar.querySelector("[data-skill-group-add]").addEventListener("click", () => {
+      groups.insertAdjacentHTML("afterbegin", skillEditCard(blankSkill()));
+      const newCard = groups.querySelector("[data-skill-edit-card]");
+      newCard.querySelector('[data-field="group"]')?.focus();
+    });
+
+    document.addEventListener("click", event => {
+      if (event.target.closest("[data-skill-remove]")) {
+        event.target.closest("[data-skill-edit-card]")?.remove();
+        return;
+      }
+      if (event.target.closest("[data-skill-item-remove]")) {
+        event.target.closest(".skill-item-edit")?.remove();
+        return;
+      }
+      if (event.target.closest("[data-skill-item-add]")) {
+        const card = event.target.closest("[data-skill-edit-card]");
+        const list = card?.querySelector("[data-skill-items]");
+        if (!list) return;
+        list.insertAdjacentHTML("beforeend", skillItemEditRow(""));
+        list.lastElementChild.querySelector("[data-skill-item]")?.focus();
+        return;
+      }
+      const step = event.target.closest("[data-level-step]");
+      if (step) {
+        const meter = step.closest(".skill-meter-editable");
+        if (!meter) return;
+        const value = Number(step.dataset.levelStep);
+        meter.dataset.skillLevel = String(value);
+        Array.from(meter.children).forEach(span => {
+          span.classList.toggle("filled", Number(span.dataset.levelStep) <= value);
+        });
+      }
+    });
+  }
+
+  function initSkillEditor() {
+    if (!document.querySelector("[data-skill-groups]")) return;
+
+    function refreshEntryVisibility() {
+      const entry = document.querySelector("[data-skill-edit-entry]");
+      const login = document.querySelector("[data-skill-edit-login]");
+      if (!entry || !login || skillEditActive) return;
+      const loggedIn = Boolean(currentIdentityUser());
+      entry.hidden = !loggedIn;
+      login.hidden = loggedIn;
+    }
+
+    onIdentityReady(() => {
+      ensureSkillEditorChrome();
+      refreshEntryVisibility();
+      window.netlifyIdentity.on("login", refreshEntryVisibility);
+      window.netlifyIdentity.on("logout", () => {
+        if (skillEditActive) exitSkillEditMode();
+        refreshEntryVisibility();
+      });
+    });
+  }
+
   function skillLevel(value) {
     const numeric = Number(value) || 0;
     const normalized = numeric > 5 ? Math.ceil(numeric / 20) : numeric;
@@ -913,12 +1124,12 @@
     const target = document.querySelector("[data-skill-map]");
     if (!target) return;
 
-    const map = (defaults.skillMap && defaults.skillMap.length)
-      ? defaults.skillMap
-      : (defaults.skills || []).slice(0, 7).map(skill => ({
-        label: skillTitle(skill),
-        value: skillLevel(skill.level)
-      }));
+    // Derived live from Skill Lines (not a separately maintained list) so
+    // editing a bar or adding/removing a skill group always stays in sync.
+    const map = (defaults.skills || []).map(skill => ({
+      label: skillTitle(skill),
+      value: skillLevel(skill.level)
+    }));
 
     const count = map.length;
     if (!count) {
@@ -978,6 +1189,22 @@
       </div>`;
   }
 
+  const SKILL_ITEMS_VISIBLE = 6;
+
+  function skillItemsListHtml(items) {
+    const visible = items.slice(0, SKILL_ITEMS_VISIBLE);
+    const rest = items.slice(SKILL_ITEMS_VISIBLE);
+    const visibleHtml = `<ul class="skill-list">${visible.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
+    if (!rest.length) return visibleHtml;
+    const restHtml = rest.map(item => `<li>${escapeHtml(item)}</li>`).join("");
+    return `
+      ${visibleHtml}
+      <details class="skill-list-more">
+        <summary>+${rest.length} more</summary>
+        <ul class="skill-list">${restHtml}</ul>
+      </details>`;
+  }
+
   function renderSkills() {
     renderSkillMap();
     renderToolGroups();
@@ -995,9 +1222,7 @@
             ${skillMeter(skill.level)}
           </div>
           <p>${escapeHtml(skillSummary(skill))}</p>
-          <ul class="skill-list">
-            ${skillItems(skill).map(item => `<li>${escapeHtml(item)}</li>`).join("")}
-          </ul>
+          ${skillItemsListHtml(skillItems(skill))}
         </article>`).join("");
     }
 
@@ -1555,6 +1780,7 @@
     renderSite();
     initProjectEditor();
     initCertificateEditor();
+    initSkillEditor();
   }
 
   init();
