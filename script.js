@@ -616,7 +616,6 @@
 
   function initProjectEditor() {
     if (!document.querySelector("[data-project-grid]")) return;
-    if (!window.netlifyIdentity) return;
 
     function refreshEntryVisibility() {
       const entry = document.querySelector("[data-project-edit-entry]");
@@ -624,15 +623,33 @@
       entry.hidden = !currentIdentityUser();
     }
 
-    window.netlifyIdentity.on("init", () => {
+    function wireIdentity() {
       ensureProjectEditorChrome();
       refreshEntryVisibility();
-    });
-    window.netlifyIdentity.on("login", refreshEntryVisibility);
-    window.netlifyIdentity.on("logout", () => {
-      if (projectEditActive) exitProjectEditMode();
-      refreshEntryVisibility();
-    });
+      window.netlifyIdentity.on("login", refreshEntryVisibility);
+      window.netlifyIdentity.on("logout", () => {
+        if (projectEditActive) exitProjectEditMode();
+        refreshEntryVisibility();
+      });
+    }
+
+    if (window.netlifyIdentity) {
+      wireIdentity();
+      return;
+    }
+
+    // The identity widget script can still be loading -- poll briefly
+    // instead of giving up, since script order/network timing varies.
+    let attempts = 0;
+    const waitForWidget = setInterval(() => {
+      attempts += 1;
+      if (window.netlifyIdentity) {
+        clearInterval(waitForWidget);
+        wireIdentity();
+      } else if (attempts > 40) {
+        clearInterval(waitForWidget);
+      }
+    }, 250);
   }
 
   function skillLevel(value) {
