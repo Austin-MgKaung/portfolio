@@ -3,7 +3,7 @@
     {
       "group": "Good g",
       "summary": "Add a summary...bvnxcvn",
-      "level": 4,
+      "level": 5,
       "focus": "Growing line",
       "items": [
         "bnbcvbn",
@@ -14,7 +14,7 @@
     {
       "group": "Analog / IC Design",
       "summary": "CMOS circuit design, SPICE simulation, open-source PDK flow, and layout verification.",
-      "level": 4,
+      "level": 2,
       "focus": "Specialist line",
       "items": [
         "CMOS fundamentals",
@@ -28,7 +28,7 @@
     {
       "group": "Digital / FPGA",
       "summary": "RTL design, FPGA implementation, bus interfaces, pipelining, and clock-domain crossing.",
-      "level": 4,
+      "level": 2,
       "focus": "Strong line",
       "items": [
         "Verilog / SystemVerilog",
