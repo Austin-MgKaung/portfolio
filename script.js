@@ -612,6 +612,105 @@
     return saveFieldToGitHub(SKILLS_JSON_PATH, fieldName, value, commitMessage);
   }
 
+  const MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
+
+  async function uploadImageToGitHub(file) {
+    if (!cachedToken) throw new Error("Not logged in.");
+    if (file.size > MAX_UPLOAD_BYTES) {
+      throw new Error("Image is too large (max 8MB). Try a smaller file.");
+    }
+
+    const arrayBuffer = await file.arrayBuffer();
+    const bytes = new Uint8Array(arrayBuffer);
+    let binary = "";
+    for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+    const base64Content = btoa(binary);
+
+    const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "-") || "image";
+    const path = `assets/uploads/${Date.now()}-${safeName}`;
+
+    const response = await fetch(`${GITHUB_API_BASE}/repos/${GITHUB_REPO}/contents/${path}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `token ${cachedToken}`,
+        Accept: "application/vnd.github+json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: `Upload image via inline editor: ${safeName}`,
+        content: base64Content,
+        branch: "main"
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => "");
+      throw new Error(`Image upload failed (HTTP ${response.status}). ${errorText}`);
+    }
+
+    return path;
+  }
+
+  function cropImageFileToSquare(file) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+      img.onload = () => {
+        const size = Math.min(img.width, img.height);
+        const canvas = document.createElement("canvas");
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext("2d");
+        const sx = (img.width - size) / 2;
+        const sy = (img.height - size) / 2;
+        ctx.drawImage(img, sx, sy, size, size, 0, 0, size, size);
+        canvas.toBlob(blob => {
+          URL.revokeObjectURL(objectUrl);
+          if (!blob) {
+            reject(new Error("Could not process image."));
+            return;
+          }
+          resolve(new File([blob], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" }));
+        }, "image/jpeg", 0.9);
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        reject(new Error("Could not load image."));
+      };
+      img.src = objectUrl;
+    });
+  }
+
+  function imageUploadFieldHtml(value) {
+    return `
+      <label>Image
+        <input type="text" data-field="image" value="${escapeHtml(value)}" placeholder="Paste a URL, or upload a file below">
+      </label>
+      <label>Upload image
+        <input type="file" accept="image/*" data-image-upload>
+      </label>
+      <span class="upload-status" data-upload-status></span>`;
+  }
+
+  async function handleInlineImageUpload(fileInput) {
+    const file = fileInput.files && fileInput.files[0];
+    if (!file) return;
+    const card = fileInput.closest("[data-project-edit-card], [data-certificate-edit-card]");
+    const targetField = card ? card.querySelector('[data-field="image"]') : null;
+    const status = card ? card.querySelector("[data-upload-status]") : null;
+
+    if (status) status.textContent = "Uploading...";
+    try {
+      const path = await uploadImageToGitHub(file);
+      if (targetField) targetField.value = path;
+      if (status) status.textContent = "Uploaded -- click Save to keep it.";
+    } catch (error) {
+      if (status) status.textContent = error.message || "Upload failed.";
+    } finally {
+      fileInput.value = "";
+    }
+  }
+
   function blankProject() {
     return normalizeProject({
       id: `project-${Date.now()}`,
@@ -654,7 +753,7 @@
             <summary>More fields</summary>
             <label>Stack <input type="text" data-field="stack" value="${escapeHtml(project.stack)}"></label>
             <label>Details <textarea data-field="details">${escapeHtml(project.details)}</textarea></label>
-            <label>Image URL <input type="text" data-field="image" value="${escapeHtml(project.image)}"></label>
+            ${imageUploadFieldHtml(project.image)}
             <label>Image alt text <input type="text" data-field="imageAlt" value="${escapeHtml(project.imageAlt)}"></label>
             <label>Link label <input type="text" data-field="linkLabel" value="${escapeHtml(project.linkLabel)}"></label>
             <label>Link URL <input type="text" data-field="linkUrl" value="${escapeHtml(project.linkUrl)}"></label>
@@ -780,6 +879,12 @@
         event.target.closest("[data-project-edit-card]")?.remove();
       }
     });
+
+    document.addEventListener("change", event => {
+      if (event.target.matches("[data-project-edit-card] [data-image-upload]")) {
+        handleInlineImageUpload(event.target);
+      }
+    });
   }
 
   function initProjectEditor() {
@@ -831,7 +936,7 @@
           <details class="project-edit-extra">
             <summary>More fields</summary>
             <label>Related skills (comma separated) <input type="text" data-field="skillsCsv" value="${escapeHtml(cert.skills.join(", "))}"></label>
-            <label>Image URL <input type="text" data-field="image" value="${escapeHtml(cert.image)}"></label>
+            ${imageUploadFieldHtml(cert.image)}
             <label>Image alt text <input type="text" data-field="imageAlt" value="${escapeHtml(cert.imageAlt)}"></label>
             <label>Link label <input type="text" data-field="linkLabel" value="${escapeHtml(cert.linkLabel)}"></label>
             <label>Link URL <input type="text" data-field="linkUrl" value="${escapeHtml(cert.linkUrl)}"></label>
@@ -952,6 +1057,12 @@
     document.addEventListener("click", event => {
       if (event.target.closest("[data-certificate-remove]")) {
         event.target.closest("[data-certificate-edit-card]")?.remove();
+      }
+    });
+
+    document.addEventListener("change", event => {
+      if (event.target.matches("[data-certificate-edit-card] [data-image-upload]")) {
+        handleInlineImageUpload(event.target);
       }
     });
   }
@@ -1329,6 +1440,43 @@
         if (!isLoggedIn() && toolEditActive) exitToolGroupEditMode();
         refreshEntryVisibility();
       });
+    });
+  }
+
+  function initProfilePhotoEditor() {
+    const button = document.querySelector("[data-photo-upload-btn]");
+    const input = document.querySelector("[data-profile-photo-upload]");
+    const status = document.querySelector("[data-profile-photo-status]");
+    if (!button || !input) return;
+
+    function refreshVisibility() {
+      button.hidden = !isLoggedIn();
+    }
+
+    input.addEventListener("change", async () => {
+      const file = input.files && input.files[0];
+      if (!file) return;
+      if (status) status.textContent = "Processing...";
+      try {
+        const squareFile = await cropImageFileToSquare(file);
+        if (status) status.textContent = "Uploading...";
+        const path = await uploadImageToGitHub(squareFile);
+        const updatedProfile = Object.assign({}, defaults.profile, { photo: path });
+        if (status) status.textContent = "Saving...";
+        await saveSiteFieldToGateway("profile", updatedProfile, "Update profile photo via inline editor");
+        defaults.profile = updatedProfile;
+        renderProfile();
+        if (status) status.textContent = "Saved -- may take a minute to appear live.";
+      } catch (error) {
+        if (status) status.textContent = error.message || "Upload failed.";
+      } finally {
+        input.value = "";
+      }
+    });
+
+    onIdentityReady(() => {
+      refreshVisibility();
+      onAuthChange(refreshVisibility);
     });
   }
 
@@ -2060,6 +2208,7 @@
     initCertificateEditor();
     initSkillEditor();
     initToolGroupEditor();
+    initProfilePhotoEditor();
   }
 
   init();
