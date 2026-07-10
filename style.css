@@ -1818,10 +1818,26 @@ h3 {
   color: var(--accent-deep);
 }
 
+.timeline-badge {
+  background: rgba(226, 138, 46, 0.16);
+  border-radius: 999px;
+  color: var(--accent-deep);
+  font-weight: 600;
+  padding: 2px 9px;
+}
+
 .timeline-card h2 {
   color: var(--ink);
   font-size: 1.22rem;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
+}
+
+.timeline-org {
+  color: var(--teal);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  margin: 0 0 10px;
+  text-transform: uppercase;
 }
 
 .timeline-card p {

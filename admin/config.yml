@@ -123,6 +123,7 @@ collections:
               - { label: "Title", name: "title", widget: "string" }
               - { label: "Tag", name: "tag", widget: "string", required: false }
               - { label: "Place", name: "place", widget: "string", required: false, hint: "City and country, for example Sheffield, UK." }
+              - { label: "Badge", name: "badge", widget: "string", required: false, hint: "Optional small highlight badge, for example an award or distinction." }
               - { label: "Summary", name: "summary", widget: "text" }
               - { label: "Details", name: "details", widget: "text", required: false, hint: "Use this to explain what you personally built, tested, or improved." }
               - label: "Highlights"
@@ -143,6 +144,7 @@ collections:
               - { label: "Institution", name: "title", widget: "string" }
               - { label: "Degree / Qualification", name: "tag", widget: "string", required: false }
               - { label: "Place", name: "place", widget: "string", required: false, hint: "City and country, for example Sheffield, UK." }
+              - { label: "Badge", name: "badge", widget: "string", required: false, hint: "Optional small highlight badge, for example a degree classification or award." }
               - { label: "Summary", name: "summary", widget: "text" }
               - { label: "Details", name: "details", widget: "text", required: false }
               - label: "Highlights"

@@ -97,6 +97,7 @@
       title: item.title || "Experience",
       tag: item.tag || "",
       place: item.place || "",
+      badge: item.badge || "",
       summary: item.summary || "",
       details: item.details || "",
       highlights: Array.isArray(item.highlights) ? item.highlights.filter(Boolean) : [],
@@ -1589,8 +1590,11 @@
     const highlights = item.highlights && item.highlights.length && !compact
       ? `<ul class="timeline-highlights">${item.highlights.map(point => `<li>${escapeHtml(point)}</li>`).join("")}</ul>`
       : "";
-    const tag = item.tag ? `<span>${escapeHtml(item.tag)}</span>` : "";
     const place = item.place ? `<span class="timeline-place">${escapeHtml(item.place)}</span>` : "";
+    const badge = item.badge ? `<span class="timeline-badge">${escapeHtml(item.badge)}</span>` : "";
+    const org = item.tag && item.title
+      ? `<p class="timeline-org">${escapeHtml(item.title)}</p>`
+      : "";
 
     return `
       <article class="timeline-item ${image ? "has-image" : ""}">
@@ -1602,10 +1606,11 @@
           <div class="timeline-copy">
             <div class="timeline-meta">
               <span>${escapeHtml(item.period)}</span>
-              ${tag}
               ${place}
+              ${badge}
             </div>
-            <h2>${escapeHtml(item.title)}</h2>
+            <h2>${escapeHtml(item.tag || item.title)}</h2>
+            ${org}
             <p>${escapeHtml(item.summary)}</p>
             ${details}
             ${highlights}
