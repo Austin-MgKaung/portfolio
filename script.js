@@ -651,28 +651,123 @@
     return path;
   }
 
-  function cropImageFileToSquare(file) {
+  function openCropModal(file, aspectRatio) {
+    const ratio = aspectRatio || 1;
     return new Promise((resolve, reject) => {
       const img = new Image();
       const objectUrl = URL.createObjectURL(file);
+
       img.onload = () => {
-        const size = Math.min(img.width, img.height);
-        const canvas = document.createElement("canvas");
-        canvas.width = size;
-        canvas.height = size;
-        const ctx = canvas.getContext("2d");
-        const sx = (img.width - size) / 2;
-        const sy = (img.height - size) / 2;
-        ctx.drawImage(img, sx, sy, size, size, 0, 0, size, size);
-        canvas.toBlob(blob => {
-          URL.revokeObjectURL(objectUrl);
-          if (!blob) {
-            reject(new Error("Could not process image."));
-            return;
+        const overlay = document.createElement("div");
+        overlay.className = "crop-modal-overlay";
+        overlay.innerHTML = `
+          <div class="crop-modal">
+            <p class="crop-modal-hint">Click where the center of the photo should be, then confirm.</p>
+            <div class="crop-modal-stage">
+              <img class="crop-modal-image" src="${objectUrl}" alt="">
+              <div class="crop-modal-frame"></div>
+            </div>
+            <div class="crop-modal-actions">
+              <button type="button" class="btn btn-small btn-ghost" data-crop-cancel>Cancel</button>
+              <button type="button" class="btn btn-small btn-primary" data-crop-confirm>Use this crop</button>
+            </div>
+          </div>`;
+        document.body.appendChild(overlay);
+
+        const stage = overlay.querySelector(".crop-modal-stage");
+        const frame = overlay.querySelector(".crop-modal-frame");
+        let centerX = 0.5;
+        let centerY = 0.5;
+
+        // The image is shown with object-fit: contain, so it may be
+        // letterboxed inside the stage. All coordinates need to be
+        // relative to the image's actual rendered rect, not the stage's.
+        function imageRect() {
+          const rect = stage.getBoundingClientRect();
+          const stageRatio = rect.width / rect.height;
+          const imgRatio = img.width / img.height;
+          let width, height;
+          if (imgRatio > stageRatio) {
+            width = rect.width;
+            height = rect.width / imgRatio;
+          } else {
+            height = rect.height;
+            width = rect.height * imgRatio;
           }
-          resolve(new File([blob], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" }));
-        }, "image/jpeg", 0.9);
+          return {
+            left: (rect.width - width) / 2,
+            top: (rect.height - height) / 2,
+            width,
+            height
+          };
+        }
+
+        function updateFrame() {
+          const rect = imageRect();
+          let frameWidth = rect.width;
+          let frameHeight = frameWidth / ratio;
+          if (frameHeight > rect.height) {
+            frameHeight = rect.height;
+            frameWidth = frameHeight * ratio;
+          }
+          frame.style.width = `${frameWidth}px`;
+          frame.style.height = `${frameHeight}px`;
+          frame.style.left = `${rect.left + centerX * rect.width - frameWidth / 2}px`;
+          frame.style.top = `${rect.top + centerY * rect.height - frameHeight / 2}px`;
+        }
+
+        function cleanup() {
+          URL.revokeObjectURL(objectUrl);
+          overlay.remove();
+          window.removeEventListener("resize", updateFrame);
+        }
+
+        stage.addEventListener("click", event => {
+          const stageRect = stage.getBoundingClientRect();
+          const rect = imageRect();
+          const clickX = event.clientX - stageRect.left - rect.left;
+          const clickY = event.clientY - stageRect.top - rect.top;
+          centerX = Math.min(1, Math.max(0, clickX / rect.width));
+          centerY = Math.min(1, Math.max(0, clickY / rect.height));
+          updateFrame();
+        });
+
+        window.addEventListener("resize", updateFrame);
+        requestAnimationFrame(updateFrame);
+
+        overlay.querySelector("[data-crop-cancel]").addEventListener("click", () => {
+          cleanup();
+          reject(new Error("cancelled"));
+        });
+
+        overlay.querySelector("[data-crop-confirm]").addEventListener("click", () => {
+          let cropWidth = img.width;
+          let cropHeight = cropWidth / ratio;
+          if (cropHeight > img.height) {
+            cropHeight = img.height;
+            cropWidth = cropHeight * ratio;
+          }
+          let sx = centerX * img.width - cropWidth / 2;
+          let sy = centerY * img.height - cropHeight / 2;
+          sx = Math.min(Math.max(sx, 0), img.width - cropWidth);
+          sy = Math.min(Math.max(sy, 0), img.height - cropHeight);
+
+          const canvas = document.createElement("canvas");
+          canvas.width = cropWidth;
+          canvas.height = cropHeight;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, sx, sy, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+          canvas.toBlob(blob => {
+            cleanup();
+            if (!blob) {
+              reject(new Error("Could not process image."));
+              return;
+            }
+            resolve(new File([blob], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" }));
+          }, "image/jpeg", 0.9);
+        });
       };
+
       img.onerror = () => {
         URL.revokeObjectURL(objectUrl);
         reject(new Error("Could not load image."));
@@ -1443,7 +1538,7 @@
     });
   }
 
-  function initProfilePhotoUploadControl(buttonSelector, inputSelector, statusSelector, fieldName, commitMessage) {
+  function initProfilePhotoUploadControl(buttonSelector, inputSelector, statusSelector, fieldName, commitMessage, aspectRatio) {
     const button = document.querySelector(buttonSelector);
     const input = document.querySelector(inputSelector);
     const status = document.querySelector(statusSelector);
@@ -1456,11 +1551,10 @@
     input.addEventListener("change", async () => {
       const file = input.files && input.files[0];
       if (!file) return;
-      if (status) status.textContent = "Processing...";
       try {
-        const squareFile = await cropImageFileToSquare(file);
+        const croppedFile = await openCropModal(file, aspectRatio);
         if (status) status.textContent = "Uploading...";
-        const path = await uploadImageToGitHub(squareFile);
+        const path = await uploadImageToGitHub(croppedFile);
         const updatedProfile = Object.assign({}, defaults.profile, { [fieldName]: path });
         if (status) status.textContent = "Saving...";
         await saveSiteFieldToGateway("profile", updatedProfile, commitMessage);
@@ -1468,7 +1562,7 @@
         renderProfile();
         if (status) status.textContent = "Saved -- may take a minute to appear live.";
       } catch (error) {
-        if (status) status.textContent = error.message || "Upload failed.";
+        if (status) status.textContent = error.message === "cancelled" ? "" : (error.message || "Upload failed.");
       } finally {
         input.value = "";
       }
@@ -1486,14 +1580,16 @@
       "[data-profile-photo-upload]",
       "[data-profile-photo-status]",
       "photo",
-      "Update profile photo via inline editor"
+      "Update profile photo via inline editor",
+      4 / 3
     );
     initProfilePhotoUploadControl(
       "[data-hero-photo-upload-btn]",
       "[data-hero-photo-upload]",
       "[data-hero-photo-status]",
       "heroPhoto",
-      "Update hero photo via inline editor"
+      "Update hero photo via inline editor",
+      1
     );
   }
 
