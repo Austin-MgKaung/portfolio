@@ -54,11 +54,16 @@
       <div class="hero-copy">
         <div class="hero-name-row">
           <span class="hero-avatar">
-            <img class="profile-photo" src="" alt="" data-profile-photo hidden>
-            <span class="profile-photo-placeholder" data-profile-initials>KMT</span>
+            <img class="profile-photo" src="" alt="" data-profile-hero-photo hidden>
+            <span class="profile-photo-placeholder" data-profile-hero-initials>KMT</span>
+            <label class="photo-upload-btn photo-upload-btn-compact" data-hero-photo-upload-btn hidden>
+              &#9998;
+              <input type="file" accept="image/*" data-hero-photo-upload>
+            </label>
           </span>
           <h1 data-profile-name>Kaung Myat Tun</h1>
         </div>
+        <span class="upload-status" data-hero-photo-status></span>
         <p class="role" data-profile-role>Embedded Electronics | PCB Hardware | Intelligent Sensing Systems</p>
         <p class="lede" data-profile-summary>
           Electronics and embedded systems engineer focused on intelligent sensing, mixed-signal PCB hardware,

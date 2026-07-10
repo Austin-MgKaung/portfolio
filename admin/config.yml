@@ -70,8 +70,10 @@ collections:
               - { label: "Summary", name: "summary", widget: "text" }
               - { label: "Why (hero tagline)", name: "why", widget: "text", required: false, hint: "One sentence on why you do this work. Shown under the summary on the Overview hero." }
               - { label: "Next Focus (timeline closing note)", name: "nextFocus", widget: "text", required: false, hint: "Where you're headed next. Shown after the Timeline sections on Overview and Experience." }
-              - { label: "Profile Photo", name: "photo", widget: "image", required: false }
+              - { label: "Profile Photo", name: "photo", widget: "image", required: false, hint: "Used on the Contact page and the masthead avatar." }
               - { label: "Profile Photo Alt Text", name: "photoAlt", widget: "string", required: false }
+              - { label: "Hero Photo", name: "heroPhoto", widget: "image", required: false, hint: "Used only for the small circle beside your name on the Overview hero. Leave blank to show initials." }
+              - { label: "Hero Photo Alt Text", name: "heroPhotoAlt", widget: "string", required: false }
               - { label: "Location", name: "location", widget: "string" }
               - { label: "Email", name: "email", widget: "string" }
               - { label: "Phone", name: "phone", widget: "string", required: false }

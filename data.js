@@ -8,6 +8,8 @@ window.PORTFOLIO_DEFAULTS = {
     nextFocus: "PLACEHOLDER - EDIT ME: Next, I'm aiming toward low-power sensor IC and mixed-signal roles, building on the tapeout and PCB work above.",
     photo: "",
     photoAlt: "Kaung Myat Tun profile photo",
+    heroPhoto: "",
+    heroPhotoAlt: "Kaung Myat Tun profile photo",
     location: "Sheffield, UK",
     phone: "+44 7377 261996",
     email: "kaungmtun.austin@gmail.com",

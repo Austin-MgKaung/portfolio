@@ -1443,10 +1443,10 @@
     });
   }
 
-  function initProfilePhotoEditor() {
-    const button = document.querySelector("[data-photo-upload-btn]");
-    const input = document.querySelector("[data-profile-photo-upload]");
-    const status = document.querySelector("[data-profile-photo-status]");
+  function initProfilePhotoUploadControl(buttonSelector, inputSelector, statusSelector, fieldName, commitMessage) {
+    const button = document.querySelector(buttonSelector);
+    const input = document.querySelector(inputSelector);
+    const status = document.querySelector(statusSelector);
     if (!button || !input) return;
 
     function refreshVisibility() {
@@ -1461,9 +1461,9 @@
         const squareFile = await cropImageFileToSquare(file);
         if (status) status.textContent = "Uploading...";
         const path = await uploadImageToGitHub(squareFile);
-        const updatedProfile = Object.assign({}, defaults.profile, { photo: path });
+        const updatedProfile = Object.assign({}, defaults.profile, { [fieldName]: path });
         if (status) status.textContent = "Saving...";
-        await saveSiteFieldToGateway("profile", updatedProfile, "Update profile photo via inline editor");
+        await saveSiteFieldToGateway("profile", updatedProfile, commitMessage);
         defaults.profile = updatedProfile;
         renderProfile();
         if (status) status.textContent = "Saved -- may take a minute to appear live.";
@@ -1478,6 +1478,23 @@
       refreshVisibility();
       onAuthChange(refreshVisibility);
     });
+  }
+
+  function initProfilePhotoEditor() {
+    initProfilePhotoUploadControl(
+      "[data-photo-upload-btn]",
+      "[data-profile-photo-upload]",
+      "[data-profile-photo-status]",
+      "photo",
+      "Update profile photo via inline editor"
+    );
+    initProfilePhotoUploadControl(
+      "[data-hero-photo-upload-btn]",
+      "[data-hero-photo-upload]",
+      "[data-hero-photo-status]",
+      "heroPhoto",
+      "Update hero photo via inline editor"
+    );
   }
 
   function skillLevel(value) {
@@ -1834,14 +1851,19 @@
     document.querySelectorAll("[data-profile-location]").forEach(target => {
       target.textContent = profile.location || "";
     });
-    document.querySelectorAll("[data-profile-initials]").forEach(target => {
-      target.textContent = initials(profile.name);
-      target.hidden = Boolean(profile.photo);
+    applyProfilePhoto("[data-profile-initials]", "[data-profile-photo]", profile.photo, profile.photoAlt, profile.name);
+    applyProfilePhoto("[data-profile-hero-initials]", "[data-profile-hero-photo]", profile.heroPhoto, profile.heroPhotoAlt, profile.name);
+  }
+
+  function applyProfilePhoto(initialsSelector, photoSelector, photoValue, photoAlt, name) {
+    document.querySelectorAll(initialsSelector).forEach(target => {
+      target.textContent = initials(name);
+      target.hidden = Boolean(photoValue);
     });
-    document.querySelectorAll("[data-profile-photo]").forEach(target => {
-      if (profile.photo) {
-        target.src = profile.photo;
-        target.alt = profile.photoAlt || `${profile.name || "Profile"} photo`;
+    document.querySelectorAll(photoSelector).forEach(target => {
+      if (photoValue) {
+        target.src = photoValue;
+        target.alt = photoAlt || `${name || "Profile"} photo`;
         target.hidden = false;
       } else {
         target.removeAttribute("src");
