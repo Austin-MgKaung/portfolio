@@ -1,6 +1,17 @@
 {
   "skills": [
     {
+      "group": "Good g",
+      "summary": "Add a summary...bvnxcvn",
+      "level": 4,
+      "focus": "Growing line",
+      "items": [
+        "bnbcvbn",
+        "bvnvbn",
+        "bvnbnvnfg"
+      ]
+    },
+    {
       "group": "Analog / IC Design",
       "summary": "CMOS circuit design, SPICE simulation, open-source PDK flow, and layout verification.",
       "level": 4,
@@ -100,13 +111,34 @@
     }
   ],
   "skillMap": [
-    { "label": "Analog / IC", "value": 4 },
-    { "label": "Digital / FPGA", "value": 4 },
-    { "label": "PCB / Hardware", "value": 4 },
-    { "label": "Embedded", "value": 3 },
-    { "label": "AI / ML", "value": 2 },
-    { "label": "Software / C++", "value": 3 },
-    { "label": "Lab", "value": 4 }
+    {
+      "label": "Analog / IC",
+      "value": 4
+    },
+    {
+      "label": "Digital / FPGA",
+      "value": 4
+    },
+    {
+      "label": "PCB / Hardware",
+      "value": 4
+    },
+    {
+      "label": "Embedded",
+      "value": 3
+    },
+    {
+      "label": "AI / ML",
+      "value": 2
+    },
+    {
+      "label": "Software / C++",
+      "value": 3
+    },
+    {
+      "label": "Lab",
+      "value": 4
+    }
   ],
   "toolGroups": [
     {
