@@ -7,6 +7,9 @@ thing<!DOCTYPE html>
     var stored = localStorage.getItem("portfolio-theme");
     var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
     document.documentElement.setAttribute("data-theme", stored || (prefersDark ? "dark" : "light"));
+    if (localStorage.getItem("portfolio-engineer-mode") === "true") {
+      document.documentElement.setAttribute("data-engineer-mode", "true");
+    }
   })();
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
