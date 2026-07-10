@@ -382,7 +382,7 @@ h1 {
     linear-gradient(135deg, rgba(19, 32, 51, 0.94), rgba(21, 111, 120, 0.72)),
     var(--panel-dark);
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 18px;
   display: grid;
   flex: 0 0 auto;
   overflow: hidden;
@@ -398,6 +398,7 @@ h1 {
 
 .hero-avatar .profile-photo-placeholder {
   border-color: rgba(255, 255, 255, 0.34);
+  border-radius: 14px;
   color: var(--panel-ink);
   font-size: 1.7rem;
   height: 100%;
