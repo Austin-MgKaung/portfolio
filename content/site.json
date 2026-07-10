@@ -347,5 +347,19 @@
       "imageAlt": ""
     }
   ],
-  "certificates": []
+  "certificates": [
+    {
+      "title": "Solidwork certficates",
+      "issuer": "",
+      "date": "",
+      "summary": "Add a summary...",
+      "skills": [
+        "fgdfgdfg"
+      ],
+      "image": "assets/uploads/1783702175419-106768.jpg",
+      "imageAlt": "New certificate image",
+      "linkLabel": "",
+      "linkUrl": ""
+    }
+  ]
 }
