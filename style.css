@@ -313,6 +313,7 @@ select:focus-visible {
   font-family: var(--font-mono);
   font-size: 12px;
   padding: 8px 12px;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 .nav-tab:hover {
@@ -1032,6 +1033,7 @@ h3 {
   font-size: 12px;
   padding: 11px 14px;
   text-transform: uppercase;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 .toolkit-tab:last-child {
@@ -1295,6 +1297,10 @@ h3 {
   position: relative;
 }
 
+.skill-card-editable .skill-card-head {
+  padding-right: 34px;
+}
+
 .skill-meter-editable span {
   cursor: pointer;
 }
@@ -1446,6 +1452,7 @@ h3 {
   font-size: 12px;
   padding: 10px 13px;
   text-transform: uppercase;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 .project-tab:last-child {
