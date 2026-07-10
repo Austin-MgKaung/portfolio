@@ -149,21 +149,6 @@
   ],
   "projects": [
     {
-      "id": "project-1783642790580",
-      "partNumber": "",
-      "title": "New projecthjghjghj",
-      "category": "sensors-instrumentation",
-      "status": "Draft",
-      "stack": "hgjfhfghjghjsrtytrjghhgfjhf",
-      "summary": "Add a summary...ghjhgjghj",
-      "details": "hgjfgjgh",
-      "image": "ghfjfghj",
-      "imageAlt": "New projectjfghjgh preview",
-      "linkLabel": "fghjfghjgh",
-      "linkUrl": "jghjgfj",
-      "featured": false
-    },
-    {
       "id": "axon-hillock",
       "partNumber": "AH-SKY130-01",
       "title": "Axon-Hillock spiking neuron",
