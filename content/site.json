@@ -149,6 +149,21 @@
   ],
   "projects": [
     {
+      "id": "project-1783648069620",
+      "partNumber": "",
+      "title": "New projecthkghkhjkghkj",
+      "category": "analog-ic",
+      "status": "Draft",
+      "stack": "khjhghkjgj",
+      "summary": "Add a summary...",
+      "details": "nmm,bn,bn,mb,bnm,",
+      "image": "",
+      "imageAlt": "New project preview",
+      "linkLabel": "",
+      "linkUrl": "",
+      "featured": false
+    },
+    {
       "id": "axon-hillock",
       "partNumber": "AH-SKY130-01",
       "title": "Axon-Hillock spiking neuron",
