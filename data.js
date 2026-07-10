@@ -377,7 +377,7 @@ window.PORTFOLIO_DEFAULTS = {
       imageAlt: "Air Products electronics engineering placement"
     },
     {
-      period: "Oct 2023 - Present",
+      period: "Oct 2023 - 2026",
       title: "Project MarsWorks",
       tag: "Software / Electronics Engineer",
       place: "Sheffield, UK",

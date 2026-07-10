@@ -1822,8 +1822,11 @@ h3 {
   background: rgba(226, 138, 46, 0.16);
   border-radius: 999px;
   color: var(--accent-deep);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
   font-weight: 600;
-  padding: 2px 9px;
+  padding: 3px 10px;
+  text-transform: uppercase;
 }
 
 .timeline-card h2 {
@@ -1833,11 +1836,15 @@ h3 {
 }
 
 .timeline-org {
+  align-items: center;
   color: var(--teal);
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
+  display: flex;
+  flex-wrap: wrap;
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-weight: 600;
+  gap: 10px;
   margin: 0 0 10px;
-  text-transform: uppercase;
 }
 
 .timeline-card p {

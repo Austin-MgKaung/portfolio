@@ -1593,7 +1593,7 @@
     const place = item.place ? `<span class="timeline-place">${escapeHtml(item.place)}</span>` : "";
     const badge = item.badge ? `<span class="timeline-badge">${escapeHtml(item.badge)}</span>` : "";
     const org = item.tag && item.title
-      ? `<p class="timeline-org">${escapeHtml(item.title)}</p>`
+      ? `<p class="timeline-org">${escapeHtml(item.title)}${badge}</p>`
       : "";
 
     return `
@@ -1607,7 +1607,6 @@
             <div class="timeline-meta">
               <span>${escapeHtml(item.period)}</span>
               ${place}
-              ${badge}
             </div>
             <h2>${escapeHtml(item.tag || item.title)}</h2>
             ${org}
