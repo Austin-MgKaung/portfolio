@@ -409,6 +409,54 @@
     return window.netlifyIdentity ? window.netlifyIdentity.currentUser() : null;
   }
 
+  function onIdentityReady(callback) {
+    if (window.netlifyIdentity) {
+      callback();
+      return;
+    }
+    // The identity widget script can still be loading -- poll briefly
+    // instead of giving up, since script order/network timing varies.
+    let attempts = 0;
+    const waitId = setInterval(() => {
+      attempts += 1;
+      if (window.netlifyIdentity) {
+        clearInterval(waitId);
+        callback();
+      } else if (attempts > 40) {
+        clearInterval(waitId);
+      }
+    }, 250);
+  }
+
+  function ensureAuthChrome() {
+    const container = document.querySelector(".masthead-right");
+    if (!container || document.querySelector("[data-auth-toggle]")) return;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "theme-toggle";
+    button.setAttribute("data-auth-toggle", "");
+    button.hidden = true;
+    button.addEventListener("click", () => window.netlifyIdentity.logout());
+    container.insertBefore(button, container.firstChild);
+  }
+
+  function refreshAuthChrome() {
+    const button = document.querySelector("[data-auth-toggle]");
+    if (!button) return;
+    const user = currentIdentityUser();
+    button.hidden = !user;
+    button.textContent = "Logout";
+  }
+
+  function initIdentityChrome() {
+    onIdentityReady(() => {
+      ensureAuthChrome();
+      refreshAuthChrome();
+      window.netlifyIdentity.on("login", refreshAuthChrome);
+      window.netlifyIdentity.on("logout", refreshAuthChrome);
+    });
+  }
+
   async function fetchSiteJsonFromGateway() {
     const user = currentIdentityUser();
     if (!user) throw new Error("Not logged in.");
@@ -421,14 +469,14 @@
     return { sha: data.sha, site: JSON.parse(base64ToUtf8(data.content)) };
   }
 
-  async function saveProjectsToGateway(projects) {
+  async function saveSiteFieldToGateway(fieldName, value, commitMessage) {
     const user = currentIdentityUser();
     if (!user) throw new Error("Not logged in.");
     const token = await user.jwt();
     const { sha, site } = await fetchSiteJsonFromGateway();
-    const updatedSite = Object.assign({}, site, { projects });
+    const updatedSite = Object.assign({}, site, { [fieldName]: value });
     const body = {
-      message: "Update projects via inline editor",
+      message: commitMessage || `Update ${fieldName} via inline editor`,
       content: utf8ToBase64(JSON.stringify(updatedSite, null, 2)),
       sha,
       branch: "main"
@@ -561,7 +609,7 @@
     setProjectEditStatus("Saving...");
     try {
       const projects = collectEditedProjects();
-      await saveProjectsToGateway(projects);
+      await saveSiteFieldToGateway("projects", projects, "Update projects via inline editor");
       defaults.projects = projects;
       setProjectEditStatus("Saved. Redeploying on Netlify now -- live in a minute or so.");
       setTimeout(() => exitProjectEditMode(), 1200);
@@ -635,7 +683,7 @@
       login.hidden = loggedIn;
     }
 
-    function wireIdentity() {
+    onIdentityReady(() => {
       ensureProjectEditorChrome();
       refreshEntryVisibility();
       window.netlifyIdentity.on("login", refreshEntryVisibility);
@@ -643,25 +691,194 @@
         if (projectEditActive) exitProjectEditMode();
         refreshEntryVisibility();
       });
-    }
+    });
+  }
 
-    if (window.netlifyIdentity) {
-      wireIdentity();
-      return;
-    }
+  let certificateEditActive = false;
 
-    // The identity widget script can still be loading -- poll briefly
-    // instead of giving up, since script order/network timing varies.
-    let attempts = 0;
-    const waitForWidget = setInterval(() => {
-      attempts += 1;
-      if (window.netlifyIdentity) {
-        clearInterval(waitForWidget);
-        wireIdentity();
-      } else if (attempts > 40) {
-        clearInterval(waitForWidget);
+  function blankCertificate() {
+    return normalizeCertificate({
+      title: "New certificate",
+      issuer: "",
+      date: "",
+      summary: "Add a summary..."
+    });
+  }
+
+  function certificateEditCard(cert) {
+    const image = cert.image
+      ? `<img class="certificate-image" src="${escapeHtml(cert.image)}" alt="${escapeHtml(cert.imageAlt || cert.title)}">`
+      : `<div class="certificate-placeholder">Certificate</div>`;
+
+    return `
+      <article class="certificate-card project-card-editable" data-certificate-edit-card>
+        <button type="button" class="project-remove-btn" data-certificate-remove aria-label="Remove certificate">&times;</button>
+        ${image}
+        <div class="certificate-body">
+          <div class="certificate-meta">
+            <span class="editable-field" contenteditable="true" data-field="issuer">${escapeHtml(cert.issuer)}</span>
+            <span class="editable-field" contenteditable="true" data-field="date">${escapeHtml(cert.date)}</span>
+          </div>
+          <h2 class="editable-field" contenteditable="true" data-field="title">${escapeHtml(cert.title)}</h2>
+          <p class="editable-field" contenteditable="true" data-field="summary">${escapeHtml(cert.summary)}</p>
+          <details class="project-edit-extra">
+            <summary>More fields</summary>
+            <label>Related skills (comma separated) <input type="text" data-field="skillsCsv" value="${escapeHtml(cert.skills.join(", "))}"></label>
+            <label>Image URL <input type="text" data-field="image" value="${escapeHtml(cert.image)}"></label>
+            <label>Image alt text <input type="text" data-field="imageAlt" value="${escapeHtml(cert.imageAlt)}"></label>
+            <label>Link label <input type="text" data-field="linkLabel" value="${escapeHtml(cert.linkLabel)}"></label>
+            <label>Link URL <input type="text" data-field="linkUrl" value="${escapeHtml(cert.linkUrl)}"></label>
+          </details>
+        </div>
+      </article>`;
+  }
+
+  function collectEditedCertificates() {
+    const cards = Array.from(document.querySelectorAll("[data-certificate-edit-card]"));
+    return cards.map(card => {
+      const field = name => card.querySelector(`[data-field="${name}"]`);
+      const text = name => {
+        const el = field(name);
+        return el ? el.textContent.trim() : "";
+      };
+      const value = name => {
+        const el = field(name);
+        return el ? el.value.trim() : "";
+      };
+      const skillsCsv = value("skillsCsv");
+      return normalizeCertificate({
+        title: text("title"),
+        issuer: text("issuer"),
+        date: text("date"),
+        summary: text("summary"),
+        skills: skillsCsv ? skillsCsv.split(",").map(item => item.trim()).filter(Boolean) : [],
+        image: value("image"),
+        imageAlt: value("imageAlt"),
+        linkLabel: value("linkLabel"),
+        linkUrl: value("linkUrl")
+      });
+    });
+  }
+
+  function renderCertificateEditGrid() {
+    const target = document.querySelector("[data-certificates-list]");
+    if (!target) return;
+    const certificates = (defaults.certificates || []).map(normalizeCertificate);
+    target.innerHTML = certificates.length
+      ? certificates.map(certificateEditCard).join("")
+      : "";
+  }
+
+  function setCertificateEditStatus(message, isError) {
+    const status = document.querySelector("[data-certificate-edit-status]");
+    if (!status) return;
+    status.textContent = message || "";
+    status.classList.toggle("is-error", Boolean(isError));
+  }
+
+  function enterCertificateEditMode() {
+    certificateEditActive = true;
+    document.querySelector("[data-certificate-edit-bar]")?.removeAttribute("hidden");
+    document.querySelector("[data-certificate-edit-entry]")?.setAttribute("hidden", "");
+    setCertificateEditStatus("Editing -- changes are not saved until you click Save.");
+    renderCertificateEditGrid();
+  }
+
+  function exitCertificateEditMode() {
+    certificateEditActive = false;
+    document.querySelector("[data-certificate-edit-bar]")?.setAttribute("hidden", "");
+    if (currentIdentityUser()) {
+      document.querySelector("[data-certificate-edit-entry]")?.removeAttribute("hidden");
+    }
+    renderCertificates();
+  }
+
+  async function saveCertificateEdits() {
+    setCertificateEditStatus("Saving...");
+    try {
+      const certificates = collectEditedCertificates();
+      await saveSiteFieldToGateway("certificates", certificates, "Update certificates via inline editor");
+      defaults.certificates = certificates;
+      setCertificateEditStatus("Saved. Redeploying on Netlify now -- live in a minute or so.");
+      setTimeout(() => exitCertificateEditMode(), 1200);
+    } catch (error) {
+      setCertificateEditStatus(error.message || "Save failed.", true);
+    }
+  }
+
+  function ensureCertificateEditorChrome() {
+    const list = document.querySelector("[data-certificates-list]");
+    if (!list || document.querySelector("[data-certificate-edit-entry]")) return;
+
+    const entryButton = document.createElement("button");
+    entryButton.type = "button";
+    entryButton.className = "btn btn-small btn-ghost project-edit-entry";
+    entryButton.setAttribute("data-certificate-edit-entry", "");
+    entryButton.textContent = "Edit certificates";
+    entryButton.hidden = true;
+    entryButton.addEventListener("click", enterCertificateEditMode);
+    list.insertAdjacentElement("beforebegin", entryButton);
+
+    const loginButton = document.createElement("button");
+    loginButton.type = "button";
+    loginButton.className = "btn btn-small btn-ghost project-edit-login";
+    loginButton.setAttribute("data-certificate-edit-login", "");
+    loginButton.textContent = "Login to edit";
+    loginButton.hidden = true;
+    loginButton.addEventListener("click", () => window.netlifyIdentity.open("login"));
+    list.insertAdjacentElement("beforebegin", loginButton);
+
+    const bar = document.createElement("div");
+    bar.className = "project-edit-bar";
+    bar.setAttribute("data-certificate-edit-bar", "");
+    bar.hidden = true;
+    bar.innerHTML = `
+      <span class="project-edit-status" data-certificate-edit-status></span>
+      <div class="project-edit-actions">
+        <button type="button" class="btn btn-small btn-ghost" data-certificate-add>+ Add certificate</button>
+        <button type="button" class="btn btn-small btn-primary" data-certificate-save>Save changes</button>
+        <button type="button" class="btn btn-small btn-ghost" data-certificate-exit-edit>Exit without saving</button>
+      </div>`;
+    list.insertAdjacentElement("beforebegin", bar);
+
+    bar.querySelector("[data-certificate-save]").addEventListener("click", saveCertificateEdits);
+    bar.querySelector("[data-certificate-exit-edit]").addEventListener("click", exitCertificateEditMode);
+    bar.querySelector("[data-certificate-add]").addEventListener("click", () => {
+      const grid = document.querySelector("[data-certificates-list]");
+      if (!grid) return;
+      grid.insertAdjacentHTML("afterbegin", certificateEditCard(blankCertificate()));
+      const newCard = grid.querySelector("[data-certificate-edit-card]");
+      newCard.querySelector('[data-field="title"]')?.focus();
+    });
+
+    document.addEventListener("click", event => {
+      if (event.target.closest("[data-certificate-remove]")) {
+        event.target.closest("[data-certificate-edit-card]")?.remove();
       }
-    }, 250);
+    });
+  }
+
+  function initCertificateEditor() {
+    if (!document.querySelector("[data-certificates-list]")) return;
+
+    function refreshEntryVisibility() {
+      const entry = document.querySelector("[data-certificate-edit-entry]");
+      const login = document.querySelector("[data-certificate-edit-login]");
+      if (!entry || !login || certificateEditActive) return;
+      const loggedIn = Boolean(currentIdentityUser());
+      entry.hidden = !loggedIn;
+      login.hidden = loggedIn;
+    }
+
+    onIdentityReady(() => {
+      ensureCertificateEditorChrome();
+      refreshEntryVisibility();
+      window.netlifyIdentity.on("login", refreshEntryVisibility);
+      window.netlifyIdentity.on("logout", () => {
+        if (certificateEditActive) exitCertificateEditMode();
+        refreshEntryVisibility();
+      });
+    });
   }
 
   function skillLevel(value) {
@@ -1333,9 +1550,11 @@
   async function init() {
     initTheme();
     initEngineerMode();
+    initIdentityChrome();
     await loadCmsContent();
     renderSite();
     initProjectEditor();
+    initCertificateEditor();
   }
 
   init();
