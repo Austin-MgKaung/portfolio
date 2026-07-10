@@ -1097,6 +1097,50 @@ h3 {
   padding: 9px 12px;
 }
 
+.toolkit-edit-list {
+  display: grid;
+  gap: 18px;
+}
+
+.toolkit-panel-editable {
+  position: relative;
+}
+
+.toolkit-panel-editable [data-tool-chip-add] {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+
+.tool-chip-editable {
+  align-items: center;
+  gap: 6px;
+  padding-right: 8px;
+}
+
+.tool-chip-editable .editable-field {
+  min-width: 20px;
+}
+
+.tool-chip-remove {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  color: var(--teal);
+  cursor: pointer;
+  display: flex;
+  font-size: 13px;
+  height: 16px;
+  justify-content: center;
+  line-height: 1;
+  width: 16px;
+}
+
+.tool-chip-remove:hover {
+  background: var(--danger);
+  color: var(--surface);
+}
+
 .github-panel {
   display: grid;
   gap: 18px;

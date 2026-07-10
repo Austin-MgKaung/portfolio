@@ -1092,6 +1092,188 @@
     });
   }
 
+  let toolEditActive = false;
+
+  function toolChipEditHtml(tool) {
+    return `
+      <span class="tool-chip tool-chip-editable">
+        <span class="editable-field" contenteditable="true" data-tool-chip>${escapeHtml(tool)}</span>
+        <button type="button" class="tool-chip-remove" data-tool-chip-remove aria-label="Remove tool">&times;</button>
+      </span>`;
+  }
+
+  function blankToolGroup() {
+    return normalizeToolGroup({ group: "New category", summary: "Add a summary...", context: "", tools: [] });
+  }
+
+  function toolGroupEditCard(group) {
+    return `
+      <article class="toolkit-panel toolkit-panel-editable" data-tool-edit-card>
+        <button type="button" class="project-remove-btn" data-tool-group-remove aria-label="Remove tool category">&times;</button>
+        <div class="toolkit-copy">
+          <h2 class="editable-field" contenteditable="true" data-field="group">${escapeHtml(group.group)}</h2>
+          <p class="editable-field" contenteditable="true" data-field="summary">${escapeHtml(group.summary)}</p>
+          <p class="editable-field toolkit-context" contenteditable="true" data-field="context">${escapeHtml(group.context)}</p>
+        </div>
+        <div class="tool-chip-grid" data-tool-chip-list>
+          ${group.tools.map(toolChipEditHtml).join("")}
+        </div>
+        <button type="button" class="btn btn-small btn-ghost" data-tool-chip-add>+ Add tool</button>
+      </article>`;
+  }
+
+  function collectEditedToolGroups() {
+    const cards = Array.from(document.querySelectorAll("[data-tool-edit-card]"));
+    return cards.map(card => {
+      const field = name => card.querySelector(`[data-field="${name}"]`);
+      const text = name => {
+        const el = field(name);
+        return el ? el.textContent.trim() : "";
+      };
+      const tools = Array.from(card.querySelectorAll("[data-tool-chip]"))
+        .map(el => el.textContent.trim())
+        .filter(Boolean);
+      return normalizeToolGroup({
+        group: text("group") || "New category",
+        summary: text("summary"),
+        context: text("context"),
+        tools
+      });
+    });
+  }
+
+  function renderToolGroupEditGrid() {
+    const target = document.querySelector("[data-toolkit]");
+    if (!target) return;
+    const groups = (defaults.toolGroups || []).map(normalizeToolGroup);
+    target.innerHTML = `<div class="toolkit-edit-list">${groups.map(toolGroupEditCard).join("")}</div>`;
+  }
+
+  function setToolEditStatus(message, isError) {
+    const status = document.querySelector("[data-tool-edit-status]");
+    if (!status) return;
+    status.textContent = message || "";
+    status.classList.toggle("is-error", Boolean(isError));
+  }
+
+  function enterToolGroupEditMode() {
+    toolEditActive = true;
+    document.querySelector("[data-tool-edit-bar]")?.removeAttribute("hidden");
+    document.querySelector("[data-tool-edit-entry]")?.setAttribute("hidden", "");
+    setToolEditStatus("Editing -- changes are not saved until you click Save.");
+    renderToolGroupEditGrid();
+  }
+
+  function exitToolGroupEditMode() {
+    toolEditActive = false;
+    document.querySelector("[data-tool-edit-bar]")?.setAttribute("hidden", "");
+    if (currentIdentityUser()) {
+      document.querySelector("[data-tool-edit-entry]")?.removeAttribute("hidden");
+    }
+    renderToolGroups();
+  }
+
+  async function saveToolGroupEdits() {
+    setToolEditStatus("Saving...");
+    try {
+      const toolGroups = collectEditedToolGroups();
+      await saveSkillsFieldToGateway("toolGroups", toolGroups, "Update tools & technologies via inline editor");
+      defaults.toolGroups = toolGroups;
+      setToolEditStatus("Saved. Redeploying on Netlify now -- live in a minute or so.");
+      setTimeout(() => exitToolGroupEditMode(), 1200);
+    } catch (error) {
+      setToolEditStatus(error.message || "Save failed.", true);
+    }
+  }
+
+  function ensureToolGroupEditorChrome() {
+    const toolkit = document.querySelector("[data-toolkit]");
+    if (!toolkit || document.querySelector("[data-tool-edit-entry]")) return;
+
+    const entryButton = document.createElement("button");
+    entryButton.type = "button";
+    entryButton.className = "btn btn-small btn-ghost project-edit-entry";
+    entryButton.setAttribute("data-tool-edit-entry", "");
+    entryButton.textContent = "Edit tools & technologies";
+    entryButton.hidden = true;
+    entryButton.addEventListener("click", enterToolGroupEditMode);
+    toolkit.insertAdjacentElement("beforebegin", entryButton);
+
+    const loginButton = document.createElement("button");
+    loginButton.type = "button";
+    loginButton.className = "btn btn-small btn-ghost project-edit-login";
+    loginButton.setAttribute("data-tool-edit-login", "");
+    loginButton.textContent = "Login to edit";
+    loginButton.hidden = true;
+    loginButton.addEventListener("click", () => window.netlifyIdentity.open("login"));
+    toolkit.insertAdjacentElement("beforebegin", loginButton);
+
+    const bar = document.createElement("div");
+    bar.className = "project-edit-bar";
+    bar.setAttribute("data-tool-edit-bar", "");
+    bar.hidden = true;
+    bar.innerHTML = `
+      <span class="project-edit-status" data-tool-edit-status></span>
+      <div class="project-edit-actions">
+        <button type="button" class="btn btn-small btn-ghost" data-tool-group-add>+ Add category</button>
+        <button type="button" class="btn btn-small btn-primary" data-tool-save>Save changes</button>
+        <button type="button" class="btn btn-small btn-ghost" data-tool-exit-edit>Exit without saving</button>
+      </div>`;
+    toolkit.insertAdjacentElement("beforebegin", bar);
+
+    bar.querySelector("[data-tool-save]").addEventListener("click", saveToolGroupEdits);
+    bar.querySelector("[data-tool-exit-edit]").addEventListener("click", exitToolGroupEditMode);
+    bar.querySelector("[data-tool-group-add]").addEventListener("click", () => {
+      const list = document.querySelector(".toolkit-edit-list");
+      if (!list) return;
+      list.insertAdjacentHTML("afterbegin", toolGroupEditCard(blankToolGroup()));
+      const newCard = list.querySelector("[data-tool-edit-card]");
+      newCard.querySelector('[data-field="group"]')?.focus();
+    });
+
+    document.addEventListener("click", event => {
+      if (event.target.closest("[data-tool-group-remove]")) {
+        event.target.closest("[data-tool-edit-card]")?.remove();
+        return;
+      }
+      if (event.target.closest("[data-tool-chip-remove]")) {
+        event.target.closest(".tool-chip-editable")?.remove();
+        return;
+      }
+      if (event.target.closest("[data-tool-chip-add]")) {
+        const card = event.target.closest("[data-tool-edit-card]");
+        const list = card?.querySelector("[data-tool-chip-list]");
+        if (!list) return;
+        list.insertAdjacentHTML("beforeend", toolChipEditHtml(""));
+        list.lastElementChild.querySelector("[data-tool-chip]")?.focus();
+        return;
+      }
+    });
+  }
+
+  function initToolGroupEditor() {
+    if (!document.querySelector("[data-toolkit]")) return;
+
+    function refreshEntryVisibility() {
+      const entry = document.querySelector("[data-tool-edit-entry]");
+      const login = document.querySelector("[data-tool-edit-login]");
+      if (!entry || !login || toolEditActive) return;
+      const loggedIn = Boolean(currentIdentityUser());
+      entry.hidden = !loggedIn;
+      login.hidden = loggedIn;
+    }
+
+    onIdentityReady(() => {
+      ensureToolGroupEditorChrome();
+      refreshEntryVisibility();
+      window.netlifyIdentity.on("login", refreshEntryVisibility);
+      window.netlifyIdentity.on("logout", () => {
+        if (toolEditActive) exitToolGroupEditMode();
+        refreshEntryVisibility();
+      });
+    });
+  }
+
   function skillLevel(value) {
     const numeric = Number(value) || 0;
     const normalized = numeric > 5 ? Math.ceil(numeric / 20) : numeric;
@@ -1781,6 +1963,7 @@
     initProjectEditor();
     initCertificateEditor();
     initSkillEditor();
+    initToolGroupEditor();
   }
 
   init();
