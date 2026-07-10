@@ -1,17 +1,6 @@
 {
   "skills": [
     {
-      "group": "Good g",
-      "summary": "Add a summary...bvnxcvn",
-      "level": 5,
-      "focus": "Growing line",
-      "items": [
-        "bnbcvbn",
-        "bvnvbn",
-        "bvnbnvnfg"
-      ]
-    },
-    {
       "group": "Analog / IC Design",
       "summary": "CMOS circuit design, SPICE simulation, open-source PDK flow, and layout verification.",
       "level": 2,
