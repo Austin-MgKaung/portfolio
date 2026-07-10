@@ -2121,7 +2121,7 @@
   }
 
   async function loadJson(path) {
-    const response = await fetch(path, { cache: "no-store" });
+    const response = await fetch(path);
     if (!response.ok) return null;
     return response.json();
   }
