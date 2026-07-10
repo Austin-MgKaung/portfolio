@@ -1,96 +1,63 @@
-# Decap CMS + GitHub Setup
+# Decap CMS Setup
 
 This site is wired for Decap CMS. The CMS edits:
 
-- `content/site.json` for profile, projects, and experience
-- `content/skills.json` for the Skills page, 5-bar proficiency levels, and skill map
+- `content/site.json` for profile, projects, experience, education, and certificates
+- `content/skills.json` for the Skills page, 5-bar proficiency levels, and tools
 - `assets/uploads/` for uploaded images and files
 
 The admin page is:
 
 ```text
-https://YOUR-SITE/admin/
+https://austin-mgkaung.github.io/portfolio/admin/
 ```
 
-## 1. Push This Site To GitHub
+## Hosting
 
-Create a GitHub repository, then push this folder.
+The site is hosted on **GitHub Pages**, deployed straight from the `main`
+branch of this repo. No build step -- pushing to `main` is the deploy.
 
-## 2. Update Decap Config
+## Authentication
 
-Open `admin/config.yml` and replace:
+Decap's `github` backend needs an OAuth App plus a small proxy to complete
+the login handshake without exposing a client secret in the browser. This
+site uses:
 
-```yaml
-repo: YOUR-GITHUB-USERNAME/YOUR-REPO-NAME
-site_url: "https://YOUR-GITHUB-USERNAME.github.io/YOUR-REPO-NAME"
-display_url: "https://YOUR-GITHUB-USERNAME.github.io/YOUR-REPO-NAME"
-```
+- A **GitHub OAuth App** ("Kaung Portfolio CMS") registered under
+  `github.com/settings/developers`, with its callback URL pointed at the
+  Worker below.
+- A **Cloudflare Worker** (`kaung-portfolio-auth.kaungmtun-austin.workers.dev`)
+  that implements the OAuth proxy: `/auth` redirects to GitHub, `/callback`
+  exchanges the code for a token and hands it back to whichever page opened
+  the login popup. The Worker holds `GITHUB_CLIENT_ID` and
+  `GITHUB_CLIENT_SECRET` as environment variables (the secret is never in
+  this repo or in any client-side code).
 
-Use your real GitHub username, repo name, and live site URL.
+`admin/config.yml`'s `backend` block points at this Worker via `base_url`
+and `auth_endpoint`.
 
-## 3. Choose Authentication
+## Two independent logins, same GitHub App
 
-Decap needs an authentication helper so the browser can safely write commits to GitHub.
+- `/admin/` (Decap CMS itself) manages its own login session internally.
+- The inline "click to edit" editors on Projects, Certificates, Skill
+  Lines, and Tools & Technologies use a separate login, triggered by the
+  **Login** button in the site's masthead. Once logged in there, that
+  session is shared across every page (stored in `localStorage`), but it
+  is *not* the same session as `/admin/` -- logging into one does not log
+  you into the other.
 
-### Option A: GitHub Backend
+Both logins go through the same GitHub OAuth App and Worker; they just
+don't share client-side state with each other.
 
-Keep this in `admin/config.yml`:
+## Editing content
 
-```yaml
-backend:
-  name: github
-  repo: YOUR-GITHUB-USERNAME/YOUR-REPO-NAME
-  branch: main
-```
+- **Via `/admin/`**: the full Decap CMS form-based editor -- best for
+  adding/removing entries with image uploads (Profile, Projects,
+  Experience, Education, Certificates, Skills).
+- **Via inline editing**: click **Login** in the masthead, then use the
+  "Edit ..." buttons that appear on Projects, Certificates, Skill Lines,
+  and Tools & Technologies for fast in-place text edits, add/remove
+  cards, and bar/chip editing directly on the live page.
 
-Then configure a Decap-compatible GitHub OAuth helper. Editors must have push access to the repo.
-
-### Option B: Netlify Git Gateway
-
-This is usually easier for a simple admin panel.
-
-1. Deploy the GitHub repo on Netlify.
-2. Enable Netlify Identity.
-3. Enable Git Gateway.
-4. Replace the backend block in `admin/config.yml` with:
-
-```yaml
-backend:
-  name: git-gateway
-  branch: main
-```
-
-Your content still lives in GitHub, but Netlify handles the login and CMS auth.
-
-## 4. Editing Content
-
-After auth works, open:
-
-```text
-/admin/
-```
-
-From there you can edit:
-
-- Profile
-- Skills
-- Skill map / 5-bar levels
-- Projects
-- Experience
-- Project images and CV files
-
-Project categories are broad electronics sections:
-
-- Analog / IC
-- Digital / FPGA
-- PCB / Hardware
-- Embedded / IoT
-- Signal Processing
-- Sensors / Instrumentation
-- Robotics / Control
-- RF / Wireless
-- Power / Energy
-- Software / C++
-- AI / ML
-
-When you click publish, Decap commits the change to GitHub. The public pages read `content/site.json` and `content/skills.json`.
+Either path commits straight to this repo's `main` branch and GitHub
+Pages redeploys automatically within a minute or so.

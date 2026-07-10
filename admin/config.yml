@@ -1,15 +1,18 @@
 # Decap CMS configuration.
-# Auth is handled by Netlify Identity + Git Gateway (set up in the Netlify
-# dashboard) -- no repo or OAuth app needed here.
+# Auth is handled by a self-hosted OAuth proxy (Cloudflare Worker) backed by
+# a real GitHub OAuth App -- see kaung-portfolio-auth.kaungmtun-austin.workers.dev.
 backend:
-  name: git-gateway
+  name: github
+  repo: Austin-MgKaung/portfolio
   branch: main
+  base_url: https://kaung-portfolio-auth.kaungmtun-austin.workers.dev
+  auth_endpoint: auth
 
 media_folder: "assets/uploads"
 public_folder: "assets/uploads"
 
-site_url: "https://kaungmyattun.netlify.app"
-display_url: "https://kaungmyattun.netlify.app"
+site_url: "https://austin-mgkaung.github.io/portfolio/"
+display_url: "https://austin-mgkaung.github.io/portfolio/"
 publish_mode: simple
 
 collections:

@@ -449,11 +449,17 @@
     ["ai-ml", "AI / ML"]
   ];
 
-  const GIT_GATEWAY_BASE = "/.netlify/git/github";
+  const OAUTH_BASE = "https://kaung-portfolio-auth.kaungmtun-austin.workers.dev";
+  const GITHUB_API_BASE = "https://api.github.com";
+  const GITHUB_REPO = "Austin-MgKaung/portfolio";
+  const TOKEN_KEY = "portfolio-gh-token";
   const SITE_JSON_PATH = "content/site.json";
   const SKILLS_JSON_PATH = "content/skills.json";
   let projectEditActive = false;
   let skillEditActive = false;
+  let cachedToken = localStorage.getItem(TOKEN_KEY) || null;
+  let authPopup = null;
+  let authListenerBound = false;
 
   function utf8ToBase64(str) {
     return btoa(unescape(encodeURIComponent(str)));
@@ -463,75 +469,118 @@
     return decodeURIComponent(escape(atob(str.replace(/\n/g, ""))));
   }
 
-  function currentIdentityUser() {
-    return window.netlifyIdentity ? window.netlifyIdentity.currentUser() : null;
+  function isLoggedIn() {
+    return Boolean(cachedToken);
   }
 
-  function onIdentityReady(callback) {
-    if (window.netlifyIdentity) {
-      callback();
+  // Kept as a boolean-returning function (rather than renaming every call
+  // site) since nothing outside this module needs the raw token itself.
+  function currentIdentityUser() {
+    return cachedToken;
+  }
+
+  function onAuthChange(handler) {
+    document.addEventListener("portfolio-auth-change", handler);
+  }
+
+  function emitAuthChange() {
+    document.dispatchEvent(new CustomEvent("portfolio-auth-change"));
+  }
+
+  function handleAuthMessage(event) {
+    const data = event.data;
+    if (typeof data !== "string") return;
+
+    if (data === "authorizing:github") {
+      // Handshake ping from the popup -- echo back so it learns our origin.
+      if (event.source) event.source.postMessage("authorizing:github", event.origin);
       return;
     }
-    // The identity widget script can still be loading -- poll briefly
-    // instead of giving up, since script order/network timing varies.
-    let attempts = 0;
-    const waitId = setInterval(() => {
-      attempts += 1;
-      if (window.netlifyIdentity) {
-        clearInterval(waitId);
-        callback();
-      } else if (attempts > 40) {
-        clearInterval(waitId);
+
+    if (data.indexOf("authorization:github:success:") === 0) {
+      try {
+        const payload = JSON.parse(data.slice("authorization:github:success:".length));
+        cachedToken = payload.token;
+        localStorage.setItem(TOKEN_KEY, cachedToken);
+      } catch (error) {
+        console.error("Failed to parse GitHub auth payload.", error);
       }
-    }, 250);
+      if (authPopup) authPopup.close();
+      authPopup = null;
+      emitAuthChange();
+    }
+  }
+
+  function login() {
+    if (!authListenerBound) {
+      window.addEventListener("message", handleAuthMessage);
+      authListenerBound = true;
+    }
+    authPopup = window.open(`${OAUTH_BASE}/auth`, "portfolio-oauth", "width=600,height=700");
+  }
+
+  function logout() {
+    cachedToken = null;
+    localStorage.removeItem(TOKEN_KEY);
+    emitAuthChange();
+  }
+
+  // No external widget script to wait for anymore -- kept as a named
+  // function purely so the four editors below didn't all need rewiring.
+  function onIdentityReady(callback) {
+    callback();
   }
 
   function ensureAuthChrome() {
     const container = document.querySelector(".masthead-right");
     if (!container || document.querySelector("[data-auth-toggle]")) return;
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "theme-toggle";
-    button.setAttribute("data-auth-toggle", "");
-    button.hidden = true;
-    button.addEventListener("click", () => window.netlifyIdentity.logout());
-    container.insertBefore(button, container.firstChild);
+
+    const loginButton = document.createElement("button");
+    loginButton.type = "button";
+    loginButton.className = "theme-toggle";
+    loginButton.setAttribute("data-auth-login", "");
+    loginButton.textContent = "Login";
+    loginButton.hidden = true;
+    loginButton.addEventListener("click", login);
+    container.insertBefore(loginButton, container.firstChild);
+
+    const logoutButton = document.createElement("button");
+    logoutButton.type = "button";
+    logoutButton.className = "theme-toggle";
+    logoutButton.setAttribute("data-auth-toggle", "");
+    logoutButton.textContent = "Logout";
+    logoutButton.hidden = true;
+    logoutButton.addEventListener("click", logout);
+    container.insertBefore(logoutButton, container.firstChild);
   }
 
   function refreshAuthChrome() {
-    const button = document.querySelector("[data-auth-toggle]");
-    if (!button) return;
-    const user = currentIdentityUser();
-    button.hidden = !user;
-    button.textContent = "Logout";
+    const loginButton = document.querySelector("[data-auth-login]");
+    const logoutButton = document.querySelector("[data-auth-toggle]");
+    const loggedIn = isLoggedIn();
+    if (loginButton) loginButton.hidden = loggedIn;
+    if (logoutButton) logoutButton.hidden = !loggedIn;
   }
 
   function initIdentityChrome() {
-    onIdentityReady(() => {
-      ensureAuthChrome();
-      refreshAuthChrome();
-      window.netlifyIdentity.on("login", refreshAuthChrome);
-      window.netlifyIdentity.on("logout", refreshAuthChrome);
-    });
+    ensureAuthChrome();
+    refreshAuthChrome();
+    onAuthChange(refreshAuthChrome);
   }
 
-  async function fetchJsonFromGateway(path) {
-    const user = currentIdentityUser();
-    if (!user) throw new Error("Not logged in.");
-    const token = await user.jwt();
-    const response = await fetch(`${GIT_GATEWAY_BASE}/contents/${path}?ref=main`, {
-      headers: { Authorization: `Bearer ${token}` }
+  async function fetchJsonFromGitHub(path) {
+    if (!cachedToken) throw new Error("Not logged in.");
+    const response = await fetch(`${GITHUB_API_BASE}/repos/${GITHUB_REPO}/contents/${path}?ref=main`, {
+      headers: { Authorization: `token ${cachedToken}`, Accept: "application/vnd.github+json" }
     });
     if (!response.ok) throw new Error(`Could not load ${path} (HTTP ${response.status}).`);
     const data = await response.json();
     return { sha: data.sha, json: JSON.parse(base64ToUtf8(data.content)) };
   }
 
-  async function saveFieldToGateway(path, fieldName, value, commitMessage) {
-    const user = currentIdentityUser();
-    if (!user) throw new Error("Not logged in.");
-    const token = await user.jwt();
-    const { sha, json } = await fetchJsonFromGateway(path);
+  async function saveFieldToGitHub(path, fieldName, value, commitMessage) {
+    if (!cachedToken) throw new Error("Not logged in.");
+    const { sha, json } = await fetchJsonFromGitHub(path);
     const updated = Object.assign({}, json, { [fieldName]: value });
     const body = {
       message: commitMessage || `Update ${fieldName} via inline editor`,
@@ -539,9 +588,13 @@
       sha,
       branch: "main"
     };
-    const response = await fetch(`${GIT_GATEWAY_BASE}/contents/${path}`, {
+    const response = await fetch(`${GITHUB_API_BASE}/repos/${GITHUB_REPO}/contents/${path}`, {
       method: "PUT",
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      headers: {
+        Authorization: `token ${cachedToken}`,
+        Accept: "application/vnd.github+json",
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify(body)
     });
     if (!response.ok) {
@@ -551,11 +604,11 @@
   }
 
   function saveSiteFieldToGateway(fieldName, value, commitMessage) {
-    return saveFieldToGateway(SITE_JSON_PATH, fieldName, value, commitMessage);
+    return saveFieldToGitHub(SITE_JSON_PATH, fieldName, value, commitMessage);
   }
 
   function saveSkillsFieldToGateway(fieldName, value, commitMessage) {
-    return saveFieldToGateway(SKILLS_JSON_PATH, fieldName, value, commitMessage);
+    return saveFieldToGitHub(SKILLS_JSON_PATH, fieldName, value, commitMessage);
   }
 
   function blankProject() {
@@ -677,7 +730,7 @@
       const projects = collectEditedProjects();
       await saveSiteFieldToGateway("projects", projects, "Update projects via inline editor");
       defaults.projects = projects;
-      setProjectEditStatus("Saved. Redeploying on Netlify now -- live in a minute or so.");
+      setProjectEditStatus("Saved. Redeploying on GitHub Pages now -- live in a minute or so.");
       setTimeout(() => exitProjectEditMode(), 1200);
     } catch (error) {
       setProjectEditStatus(error.message || "Save failed.", true);
@@ -740,9 +793,8 @@
     onIdentityReady(() => {
       ensureProjectEditorChrome();
       refreshEntryVisibility();
-      window.netlifyIdentity.on("login", refreshEntryVisibility);
-      window.netlifyIdentity.on("logout", () => {
-        if (projectEditActive) exitProjectEditMode();
+      onAuthChange(() => {
+        if (!isLoggedIn() && projectEditActive) exitProjectEditMode();
         refreshEntryVisibility();
       });
     });
@@ -853,7 +905,7 @@
       const certificates = collectEditedCertificates();
       await saveSiteFieldToGateway("certificates", certificates, "Update certificates via inline editor");
       defaults.certificates = certificates;
-      setCertificateEditStatus("Saved. Redeploying on Netlify now -- live in a minute or so.");
+      setCertificateEditStatus("Saved. Redeploying on GitHub Pages now -- live in a minute or so.");
       setTimeout(() => exitCertificateEditMode(), 1200);
     } catch (error) {
       setCertificateEditStatus(error.message || "Save failed.", true);
@@ -915,9 +967,8 @@
     onIdentityReady(() => {
       ensureCertificateEditorChrome();
       refreshEntryVisibility();
-      window.netlifyIdentity.on("login", refreshEntryVisibility);
-      window.netlifyIdentity.on("logout", () => {
-        if (certificateEditActive) exitCertificateEditMode();
+      onAuthChange(() => {
+        if (!isLoggedIn() && certificateEditActive) exitCertificateEditMode();
         refreshEntryVisibility();
       });
     });
@@ -1021,7 +1072,7 @@
       const skills = collectEditedSkills();
       await saveSkillsFieldToGateway("skills", skills, "Update skill lines via inline editor");
       defaults.skills = skills;
-      setSkillEditStatus("Saved. Redeploying on Netlify now -- live in a minute or so.");
+      setSkillEditStatus("Saved. Redeploying on GitHub Pages now -- live in a minute or so.");
       setTimeout(() => exitSkillEditMode(), 1200);
     } catch (error) {
       setSkillEditStatus(error.message || "Save failed.", true);
@@ -1104,9 +1155,8 @@
     onIdentityReady(() => {
       ensureSkillEditorChrome();
       refreshEntryVisibility();
-      window.netlifyIdentity.on("login", refreshEntryVisibility);
-      window.netlifyIdentity.on("logout", () => {
-        if (skillEditActive) exitSkillEditMode();
+      onAuthChange(() => {
+        if (!isLoggedIn() && skillEditActive) exitSkillEditMode();
         refreshEntryVisibility();
       });
     });
@@ -1199,7 +1249,7 @@
       const toolGroups = collectEditedToolGroups();
       await saveSkillsFieldToGateway("toolGroups", toolGroups, "Update tools & technologies via inline editor");
       defaults.toolGroups = toolGroups;
-      setToolEditStatus("Saved. Redeploying on Netlify now -- live in a minute or so.");
+      setToolEditStatus("Saved. Redeploying on GitHub Pages now -- live in a minute or so.");
       setTimeout(() => exitToolGroupEditMode(), 1200);
     } catch (error) {
       setToolEditStatus(error.message || "Save failed.", true);
@@ -1274,9 +1324,8 @@
     onIdentityReady(() => {
       ensureToolGroupEditorChrome();
       refreshEntryVisibility();
-      window.netlifyIdentity.on("login", refreshEntryVisibility);
-      window.netlifyIdentity.on("logout", () => {
-        if (toolEditActive) exitToolGroupEditMode();
+      onAuthChange(() => {
+        if (!isLoggedIn() && toolEditActive) exitToolGroupEditMode();
         refreshEntryVisibility();
       });
     });
