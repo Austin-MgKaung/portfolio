@@ -240,8 +240,9 @@
 <script src="script.js"></script>
 <script>
   if (window.netlifyIdentity) {
+    const isInviteOrRecovery = /invite_token|recovery_token|confirmation_token/.test(window.location.hash);
     window.netlifyIdentity.on("init", user => {
-      if (!user) {
+      if (!user && isInviteOrRecovery) {
         window.netlifyIdentity.on("login", () => {
           document.location.href = "/admin/";
         });

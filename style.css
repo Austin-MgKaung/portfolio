@@ -1427,7 +1427,8 @@ h3 {
   padding: 4px 10px;
 }
 
-.project-edit-entry {
+.project-edit-entry,
+.project-edit-login {
   margin-bottom: 14px;
 }
 

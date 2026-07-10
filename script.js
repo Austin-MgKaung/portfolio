@@ -584,6 +584,15 @@
     entryButton.addEventListener("click", enterProjectEditMode);
     toolbar.insertAdjacentElement("beforebegin", entryButton);
 
+    const loginButton = document.createElement("button");
+    loginButton.type = "button";
+    loginButton.className = "btn btn-small btn-ghost project-edit-login";
+    loginButton.setAttribute("data-project-edit-login", "");
+    loginButton.textContent = "Login to edit";
+    loginButton.hidden = true;
+    loginButton.addEventListener("click", () => window.netlifyIdentity.open("login"));
+    toolbar.insertAdjacentElement("beforebegin", loginButton);
+
     const bar = document.createElement("div");
     bar.className = "project-edit-bar";
     bar.setAttribute("data-project-edit-bar", "");
@@ -619,8 +628,11 @@
 
     function refreshEntryVisibility() {
       const entry = document.querySelector("[data-project-edit-entry]");
-      if (!entry || projectEditActive) return;
-      entry.hidden = !currentIdentityUser();
+      const login = document.querySelector("[data-project-edit-login]");
+      if (!entry || !login || projectEditActive) return;
+      const loggedIn = Boolean(currentIdentityUser());
+      entry.hidden = !loggedIn;
+      login.hidden = loggedIn;
     }
 
     function wireIdentity() {
