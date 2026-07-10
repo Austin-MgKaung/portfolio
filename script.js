@@ -141,6 +141,9 @@
       experience: Array.isArray(site.experience)
         ? site.experience.map(normalizeExperience)
         : clone(fallback.experience || []).map(normalizeExperience),
+      education: Array.isArray(site.education)
+        ? site.education.map(normalizeExperience)
+        : clone(fallback.education || []).map(normalizeExperience),
       certificates: Array.isArray(site.certificates)
         ? site.certificates.map(normalizeCertificate)
         : clone(fallback.certificates || []).map(normalizeCertificate)
@@ -321,21 +324,28 @@
     target.innerHTML = projects.map(project => projectCard(project, true)).join("");
   }
 
+  function projectDetailHref(project) {
+    return `project.html?id=${encodeURIComponent(project.id)}`;
+  }
+
   function projectCard(project, compact) {
     const details = compact ? escapeHtml(project.summary) : escapeHtml(project.details || project.summary);
     const action = project.linkUrl && project.linkLabel
       ? `<a class="inline-link" href="${escapeHtml(project.linkUrl)}" target="_blank" rel="noopener">${escapeHtml(project.linkLabel)}</a>`
       : "";
+    const detailHref = projectDetailHref(project);
 
     return `
       <article class="project-card" data-category="${escapeHtml(project.category)}" data-project-card="${escapeHtml(project.id)}">
-        <img class="project-image" src="${projectImage(project)}" alt="${escapeHtml(project.imageAlt || project.title)}">
+        <a class="project-image-link" href="${detailHref}">
+          <img class="project-image" src="${projectImage(project)}" alt="${escapeHtml(project.imageAlt || project.title)}">
+        </a>
         <div class="project-card-body">
           <div class="project-meta">
             <span>${escapeHtml(project.partNumber)}</span>
             <span>${escapeHtml(CATEGORY_LABELS[project.category] || project.category)}</span>
           </div>
-          <h2>${escapeHtml(project.title)}</h2>
+          <h2><a class="project-card-title-link" href="${detailHref}">${escapeHtml(project.title)}</a></h2>
           <p>${details}</p>
           <div class="project-card-foot">
             <span class="status-pill">${escapeHtml(project.status)}</span>
@@ -377,6 +387,52 @@
     });
 
     update("all");
+  }
+
+  function renderProjectDetail() {
+    const target = document.querySelector("[data-project-detail]");
+    if (!target) return;
+
+    const id = new URLSearchParams(window.location.search).get("id");
+    const project = getProjects().find(item => item.id === id);
+
+    if (!project) {
+      target.innerHTML = `
+        ${emptyState("Project not found", "This project may have been removed, or the link is out of date.")}
+        <p style="margin-top: 14px;"><a class="inline-link" href="projects.html">Back to all projects</a></p>`;
+      return;
+    }
+
+    document.title = `${project.title} | Kaung Myat Tun`;
+    const descriptionTag = document.querySelector('meta[name="description"]');
+    if (descriptionTag) descriptionTag.setAttribute("content", project.summary || project.details || "");
+
+    const action = project.linkUrl && project.linkLabel
+      ? `<a class="btn btn-primary" href="${escapeHtml(project.linkUrl)}" target="_blank" rel="noopener">${escapeHtml(project.linkLabel)}</a>`
+      : "";
+
+    target.innerHTML = `
+      <div class="project-detail">
+        <img class="project-detail-image" src="${projectImage(project)}" alt="${escapeHtml(project.imageAlt || project.title)}">
+        <div class="project-detail-body">
+          <div class="project-meta">
+            <span>${escapeHtml(project.partNumber)}</span>
+            <span>${escapeHtml(CATEGORY_LABELS[project.category] || project.category)}</span>
+            <span class="status-pill">${escapeHtml(project.status)}</span>
+          </div>
+          <h1>${escapeHtml(project.title)}</h1>
+          <p class="lede">${escapeHtml(project.details || project.summary)}</p>
+          ${project.stack ? `
+            <div class="project-detail-stack">
+              <span class="project-detail-label">Stack</span>
+              <p>${escapeHtml(project.stack)}</p>
+            </div>` : ""}
+          <div class="hero-actions">
+            ${action}
+            <a class="btn btn-ghost" href="projects.html">All projects</a>
+          </div>
+        </div>
+      </div>`;
   }
 
   const PROJECT_CATEGORY_OPTIONS = [
@@ -642,15 +698,6 @@
     entryButton.addEventListener("click", enterProjectEditMode);
     toolbar.insertAdjacentElement("beforebegin", entryButton);
 
-    const loginButton = document.createElement("button");
-    loginButton.type = "button";
-    loginButton.className = "btn btn-small btn-ghost project-edit-login";
-    loginButton.setAttribute("data-project-edit-login", "");
-    loginButton.textContent = "Login to edit";
-    loginButton.hidden = true;
-    loginButton.addEventListener("click", () => window.netlifyIdentity.open("login"));
-    toolbar.insertAdjacentElement("beforebegin", loginButton);
-
     const bar = document.createElement("div");
     bar.className = "project-edit-bar";
     bar.setAttribute("data-project-edit-bar", "");
@@ -686,11 +733,8 @@
 
     function refreshEntryVisibility() {
       const entry = document.querySelector("[data-project-edit-entry]");
-      const login = document.querySelector("[data-project-edit-login]");
-      if (!entry || !login || projectEditActive) return;
-      const loggedIn = Boolean(currentIdentityUser());
-      entry.hidden = !loggedIn;
-      login.hidden = loggedIn;
+      if (!entry || projectEditActive) return;
+      entry.hidden = !currentIdentityUser();
     }
 
     onIdentityReady(() => {
@@ -829,15 +873,6 @@
     entryButton.addEventListener("click", enterCertificateEditMode);
     list.insertAdjacentElement("beforebegin", entryButton);
 
-    const loginButton = document.createElement("button");
-    loginButton.type = "button";
-    loginButton.className = "btn btn-small btn-ghost project-edit-login";
-    loginButton.setAttribute("data-certificate-edit-login", "");
-    loginButton.textContent = "Login to edit";
-    loginButton.hidden = true;
-    loginButton.addEventListener("click", () => window.netlifyIdentity.open("login"));
-    list.insertAdjacentElement("beforebegin", loginButton);
-
     const bar = document.createElement("div");
     bar.className = "project-edit-bar";
     bar.setAttribute("data-certificate-edit-bar", "");
@@ -873,11 +908,8 @@
 
     function refreshEntryVisibility() {
       const entry = document.querySelector("[data-certificate-edit-entry]");
-      const login = document.querySelector("[data-certificate-edit-login]");
-      if (!entry || !login || certificateEditActive) return;
-      const loggedIn = Boolean(currentIdentityUser());
-      entry.hidden = !loggedIn;
-      login.hidden = loggedIn;
+      if (!entry || certificateEditActive) return;
+      entry.hidden = !currentIdentityUser();
     }
 
     onIdentityReady(() => {
@@ -1009,15 +1041,6 @@
     entryButton.addEventListener("click", enterSkillEditMode);
     groups.insertAdjacentElement("beforebegin", entryButton);
 
-    const loginButton = document.createElement("button");
-    loginButton.type = "button";
-    loginButton.className = "btn btn-small btn-ghost project-edit-login";
-    loginButton.setAttribute("data-skill-edit-login", "");
-    loginButton.textContent = "Login to edit";
-    loginButton.hidden = true;
-    loginButton.addEventListener("click", () => window.netlifyIdentity.open("login"));
-    groups.insertAdjacentElement("beforebegin", loginButton);
-
     const bar = document.createElement("div");
     bar.className = "project-edit-bar";
     bar.setAttribute("data-skill-edit-bar", "");
@@ -1074,11 +1097,8 @@
 
     function refreshEntryVisibility() {
       const entry = document.querySelector("[data-skill-edit-entry]");
-      const login = document.querySelector("[data-skill-edit-login]");
-      if (!entry || !login || skillEditActive) return;
-      const loggedIn = Boolean(currentIdentityUser());
-      entry.hidden = !loggedIn;
-      login.hidden = loggedIn;
+      if (!entry || skillEditActive) return;
+      entry.hidden = !currentIdentityUser();
     }
 
     onIdentityReady(() => {
@@ -1199,15 +1219,6 @@
     entryButton.addEventListener("click", enterToolGroupEditMode);
     toolkit.insertAdjacentElement("beforebegin", entryButton);
 
-    const loginButton = document.createElement("button");
-    loginButton.type = "button";
-    loginButton.className = "btn btn-small btn-ghost project-edit-login";
-    loginButton.setAttribute("data-tool-edit-login", "");
-    loginButton.textContent = "Login to edit";
-    loginButton.hidden = true;
-    loginButton.addEventListener("click", () => window.netlifyIdentity.open("login"));
-    toolkit.insertAdjacentElement("beforebegin", loginButton);
-
     const bar = document.createElement("div");
     bar.className = "project-edit-bar";
     bar.setAttribute("data-tool-edit-bar", "");
@@ -1256,11 +1267,8 @@
 
     function refreshEntryVisibility() {
       const entry = document.querySelector("[data-tool-edit-entry]");
-      const login = document.querySelector("[data-tool-edit-login]");
-      if (!entry || !login || toolEditActive) return;
-      const loggedIn = Boolean(currentIdentityUser());
-      entry.hidden = !loggedIn;
-      login.hidden = loggedIn;
+      if (!entry || toolEditActive) return;
+      entry.hidden = !currentIdentityUser();
     }
 
     onIdentityReady(() => {
@@ -1300,6 +1308,23 @@
     if (Array.isArray(skill.items) && skill.items.length) return skill.items;
     if (skill.notes) return String(skill.notes).split(",").map(item => item.trim()).filter(Boolean);
     return [];
+  }
+
+  function wrapLabelLines(text, maxLineLength) {
+    const words = String(text || "").split(" ").filter(Boolean);
+    const lines = [];
+    let current = "";
+    words.forEach(word => {
+      const candidate = current ? `${current} ${word}` : word;
+      if (candidate.length > maxLineLength && current) {
+        lines.push(current);
+        current = word;
+      } else {
+        current = candidate;
+      }
+    });
+    if (current) lines.push(current);
+    return lines.length ? lines : [""];
   }
 
   function renderSkillMap() {
@@ -1344,9 +1369,15 @@
       const p = point(index, 5);
       const label = point(index, 5, radius + 42);
       const anchor = label.x < cx - 8 ? "end" : label.x > cx + 8 ? "start" : "middle";
+      const lines = wrapLabelLines(item.label, 12);
+      const lineHeight = 11;
+      const tspans = lines.map((line, i) => {
+        const dy = i === 0 ? (lines.length > 1 ? -(lineHeight / 2) : 0) : lineHeight;
+        return `<tspan x="${label.x.toFixed(1)}" dy="${dy}">${escapeHtml(line)}</tspan>`;
+      }).join("");
       return `
         <line class="skill-radar-axis" x1="${cx}" y1="${cy}" x2="${p.x.toFixed(1)}" y2="${p.y.toFixed(1)}"></line>
-        <text class="skill-radar-label" x="${label.x.toFixed(1)}" y="${label.y.toFixed(1)}" text-anchor="${anchor}">${escapeHtml(item.label)}</text>`;
+        <text class="skill-radar-label" y="${label.y.toFixed(1)}" text-anchor="${anchor}">${tspans}</text>`;
     }).join("");
 
     const shape = map.map((item, index) => {
@@ -1487,6 +1518,16 @@
     target.innerHTML = items.length
       ? items.map((item, index) => timelineItem(item, index, true)).join("")
       : emptyState("Timeline coming soon", "Add experience entries in Admin and they will appear here.");
+  }
+
+  function renderEducation() {
+    const target = document.querySelector("[data-education-list]");
+    if (!target) return;
+
+    const items = (defaults.education || []).map(normalizeExperience);
+    target.innerHTML = items.length
+      ? items.map((item, index) => timelineItem(item, index, false)).join("")
+      : emptyState("No education added yet", "Add education entries in Admin to show them here.");
   }
 
   function timelineItem(item, index, compact) {
@@ -1943,10 +1984,12 @@
     setActivePage();
     renderFeaturedProjects();
     renderProjectGrid();
+    renderProjectDetail();
     renderSkills();
     renderGithubActivity();
     renderOverviewTimeline();
     renderExperience();
+    renderEducation();
     renderCertificates();
     renderProfile();
     renderContact();

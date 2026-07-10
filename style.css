@@ -966,6 +966,7 @@ h3 {
 
 .skill-radar {
   display: block;
+  overflow: visible;
   width: 100%;
 }
 
@@ -1551,8 +1552,59 @@ h3 {
   padding: 4px 10px;
 }
 
-.project-edit-entry,
-.project-edit-login {
+.project-image-link {
+  border-bottom: 0;
+  display: block;
+}
+
+.project-card-title-link {
+  border-bottom: 0;
+  color: inherit;
+}
+
+.project-card-title-link:hover {
+  color: var(--teal);
+}
+
+.project-detail {
+  align-items: start;
+  display: grid;
+  gap: 28px;
+  grid-template-columns: minmax(280px, 0.9fr) minmax(0, 1.1fr);
+}
+
+.project-detail-image {
+  aspect-ratio: 16 / 10;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  object-fit: cover;
+  width: 100%;
+}
+
+.project-detail-body h1 {
+  font-size: 2rem;
+  margin: 12px 0 16px;
+}
+
+.project-detail-stack {
+  margin: 18px 0;
+}
+
+.project-detail-label {
+  color: var(--muted);
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.project-detail-stack p {
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+.project-edit-entry {
   margin-bottom: 14px;
 }
 
@@ -2244,7 +2296,8 @@ h3 {
   .skill-map-card,
   .toolkit-panel,
   .contact-shell,
-  .monitor-grid {
+  .monitor-grid,
+  .project-detail {
     grid-template-columns: 1fr;
   }
 

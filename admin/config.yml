@@ -130,6 +130,26 @@ collections:
               - { label: "Image", name: "image", widget: "image", required: false }
               - { label: "Image Alt Text", name: "imageAlt", widget: "string", required: false }
 
+          - label: "Education"
+            name: "education"
+            widget: "list"
+            summary: "{{fields.title}}"
+            hint: "Shown in an Education section on the Overview page."
+            fields:
+              - { label: "Period", name: "period", widget: "string", hint: "For example: 2022 - 2026." }
+              - { label: "Institution", name: "title", widget: "string" }
+              - { label: "Degree / Qualification", name: "tag", widget: "string", required: false }
+              - { label: "Place", name: "place", widget: "string", required: false, hint: "City and country, for example Sheffield, UK." }
+              - { label: "Summary", name: "summary", widget: "text" }
+              - { label: "Details", name: "details", widget: "text", required: false }
+              - label: "Highlights"
+                name: "highlights"
+                widget: "list"
+                required: false
+                field: { label: "Highlight", name: "highlight", widget: "string" }
+              - { label: "Image", name: "image", widget: "image", required: false }
+              - { label: "Image Alt Text", name: "imageAlt", widget: "string", required: false }
+
           - label: "Certificates"
             name: "certificates"
             widget: "list"
