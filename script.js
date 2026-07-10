@@ -1924,6 +1924,10 @@
 
   function renderProfile() {
     const profile = defaults.profile || {};
+    const favicon = document.getElementById("favicon");
+    if (favicon && profile.heroPhoto) {
+      favicon.href = profile.heroPhoto;
+    }
     document.querySelectorAll("[data-profile-name]").forEach(target => {
       target.textContent = profile.name || "";
     });
