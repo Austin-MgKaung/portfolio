@@ -1058,6 +1058,7 @@ h3 {
 .skill-map-legend {
   display: grid;
   gap: 12px;
+  max-width: 340px;
 }
 
 .skill-map-row {
