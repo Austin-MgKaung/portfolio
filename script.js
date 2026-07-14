@@ -81,14 +81,37 @@
       category: project.category || "analog-ic",
       status: project.status || "Draft",
       stack: project.stack || "",
-      summary: project.summary || "",
+      summary: project.summary || project.oneLiner || "",
       details: project.details || "",
       image: project.image || "",
       imageAlt: project.imageAlt || `${project.title || "Project"} preview`,
       linkLabel: project.linkLabel || "",
       linkUrl: project.linkUrl || "",
-      featured: Boolean(project.featured)
+      featured: Boolean(project.featured),
+      tags: Array.isArray(project.tags) ? project.tags.filter(Boolean) : [],
+      oneLiner: project.oneLiner || project.summary || "",
+      overview: project.overview || project.details || "",
+      role: project.role || "",
+      specs: Array.isArray(project.specs)
+        ? project.specs.filter(pair => Array.isArray(pair) && (pair[0] || pair[1]))
+        : [],
+      detail: Array.isArray(project.detail)
+        ? project.detail.filter(item => item && (item.heading || item.body))
+        : [],
+      gallery: Array.isArray(project.gallery)
+        ? project.gallery.filter(item => item && item.src)
+        : [],
+      skills: Array.isArray(project.skills) ? project.skills.filter(Boolean) : [],
+      links: {
+        github: (project.links && project.links.github) || "",
+        report: (project.links && project.links.report) || "",
+        demo: (project.links && project.links.demo) || ""
+      }
     };
+  }
+
+  function splitList(value) {
+    return String(value || "").split(",").map(part => part.trim()).filter(Boolean);
   }
 
   function normalizeExperience(item) {
@@ -330,7 +353,7 @@
   }
 
   function projectCard(project, compact) {
-    const details = compact ? escapeHtml(project.summary) : escapeHtml(project.details || project.summary);
+    const details = compact ? escapeHtml(project.summary) : escapeHtml(project.overview || project.details || project.summary);
     const action = project.linkUrl && project.linkLabel
       ? `<a class="inline-link" href="${escapeHtml(project.linkUrl)}" target="_blank" rel="noopener">${escapeHtml(project.linkLabel)}</a>`
       : "";
@@ -390,6 +413,117 @@
     update("all");
   }
 
+  function projectHeaderBand(project) {
+    const tagsHtml = project.tags.map(tag => `<span class="tool-chip">${escapeHtml(tag)}</span>`).join("");
+    const stackItems = splitList(project.stack);
+
+    return `
+      <section class="section section-compact project-detail-header">
+        <div class="project-meta">
+          <span>${escapeHtml(project.partNumber)}</span>
+          <span>${escapeHtml(CATEGORY_LABELS[project.category] || project.category)}</span>
+          ${tagsHtml}
+          <span class="status-pill">${escapeHtml(project.status)}</span>
+        </div>
+        <h1>${escapeHtml(project.title)}</h1>
+        ${project.oneLiner ? `<p class="lede">${escapeHtml(project.oneLiner)}</p>` : ""}
+        ${stackItems.length ? `
+          <div class="project-detail-stack">
+            <span class="project-detail-label">Stack</span>
+            <div class="tool-chip-grid">
+              ${stackItems.map(item => `<span class="tool-chip">${escapeHtml(item)}</span>`).join("")}
+            </div>
+          </div>` : ""}
+      </section>`;
+  }
+
+  function projectTextSection(heading, text) {
+    if (!text) return "";
+    return `
+      <section class="section section-compact">
+        <h2>${escapeHtml(heading)}</h2>
+        <p class="project-section-text">${escapeHtml(text)}</p>
+      </section>`;
+  }
+
+  function projectSpecsSection(specs) {
+    if (!specs.length) return "";
+    return `
+      <section class="section section-compact">
+        <h2>Key Specifications</h2>
+        <div class="table-wrap">
+          <table class="datasheet-table">
+            <thead><tr><th>Parameter</th><th>Value</th></tr></thead>
+            <tbody>
+              ${specs.map(([key, value]) => `<tr><td class="sym">${escapeHtml(key)}</td><td>${escapeHtml(value)}</td></tr>`).join("")}
+            </tbody>
+          </table>
+        </div>
+      </section>`;
+  }
+
+  function projectDetailSection(detail) {
+    if (!detail.length) return "";
+    return `
+      <section class="section section-compact">
+        <h2>Technical Detail</h2>
+        <div class="detail-accordion">
+          ${detail.map((item, index) => `
+            <details class="detail-item"${index === 0 ? " open" : ""}>
+              <summary>${escapeHtml(item.heading)}</summary>
+              <p>${escapeHtml(item.body)}</p>
+            </details>`).join("")}
+        </div>
+      </section>`;
+  }
+
+  function projectGallerySection(project) {
+    const gallery = project.gallery.length
+      ? project.gallery
+      : (project.image ? [{ src: project.image, caption: project.imageAlt || "" }] : []);
+    if (!gallery.length) return "";
+    return `
+      <section class="section section-compact">
+        <h2>Gallery</h2>
+        <div class="project-gallery-grid">
+          ${gallery.map(item => `
+            <figure class="project-gallery-item">
+              <img src="${escapeHtml(item.src)}" alt="${escapeHtml(item.caption || project.title)}">
+              ${item.caption ? `<figcaption>${escapeHtml(item.caption)}</figcaption>` : ""}
+            </figure>`).join("")}
+        </div>
+      </section>`;
+  }
+
+  function projectSkillsSection(skills) {
+    if (!skills.length) return "";
+    return `
+      <section class="section section-compact">
+        <h2>Skills / Tools</h2>
+        <div class="tool-chip-grid">
+          ${skills.map(skill => `<span class="tool-chip">${escapeHtml(skill)}</span>`).join("")}
+        </div>
+      </section>`;
+  }
+
+  function projectLinksSection(project) {
+    const buttons = [];
+    if (project.links.github) buttons.push({ label: "GitHub", url: project.links.github });
+    if (project.links.report) buttons.push({ label: "Report", url: project.links.report });
+    if (project.links.demo) buttons.push({ label: "Demo", url: project.links.demo });
+    if (!buttons.length && project.linkUrl && project.linkLabel) {
+      buttons.push({ label: project.linkLabel, url: project.linkUrl });
+    }
+    if (!buttons.length) return "";
+    return `
+      <section class="section section-compact">
+        <h2>Links</h2>
+        <div class="hero-actions">
+          ${buttons.map((btn, index) => `<a class="btn ${index === 0 ? "btn-primary" : "btn-ghost"}" href="${escapeHtml(btn.url)}" target="_blank" rel="noopener">${escapeHtml(btn.label)}</a>`).join("")}
+        </div>
+      </section>`;
+  }
+
   function renderProjectDetail() {
     const target = document.querySelector("[data-project-detail]");
     if (!target) return;
@@ -399,41 +533,27 @@
 
     if (!project) {
       target.innerHTML = `
-        ${emptyState("Project not found", "This project may have been removed, or the link is out of date.")}
-        <p style="margin-top: 14px;"><a class="inline-link" href="projects.html">Back to all projects</a></p>`;
+        <section class="section">
+          ${emptyState("Project not found", "This project may have been removed, or the link is out of date.")}
+          <p style="margin-top: 14px;"><a class="inline-link" href="projects.html">Back to all projects</a></p>
+        </section>`;
       return;
     }
 
     document.title = `${project.title} | Kaung Myat Tun`;
     const descriptionTag = document.querySelector('meta[name="description"]');
-    if (descriptionTag) descriptionTag.setAttribute("content", project.summary || project.details || "");
+    if (descriptionTag) descriptionTag.setAttribute("content", project.oneLiner || project.overview || project.summary || "");
 
-    const action = project.linkUrl && project.linkLabel
-      ? `<a class="btn btn-primary" href="${escapeHtml(project.linkUrl)}" target="_blank" rel="noopener">${escapeHtml(project.linkLabel)}</a>`
-      : "";
-
-    target.innerHTML = `
-      <div class="project-detail">
-        <img class="project-detail-image" src="${projectImage(project)}" alt="${escapeHtml(project.imageAlt || project.title)}">
-        <div class="project-detail-body">
-          <div class="project-meta">
-            <span>${escapeHtml(project.partNumber)}</span>
-            <span>${escapeHtml(CATEGORY_LABELS[project.category] || project.category)}</span>
-            <span class="status-pill">${escapeHtml(project.status)}</span>
-          </div>
-          <h1>${escapeHtml(project.title)}</h1>
-          <p class="lede">${escapeHtml(project.details || project.summary)}</p>
-          ${project.stack ? `
-            <div class="project-detail-stack">
-              <span class="project-detail-label">Stack</span>
-              <p>${escapeHtml(project.stack)}</p>
-            </div>` : ""}
-          <div class="hero-actions">
-            ${action}
-            <a class="btn btn-ghost" href="projects.html">All projects</a>
-          </div>
-        </div>
-      </div>`;
+    target.innerHTML = [
+      projectHeaderBand(project),
+      projectTextSection("Overview", project.overview),
+      projectTextSection("My Role", project.role),
+      projectSpecsSection(project.specs),
+      projectDetailSection(project.detail),
+      projectGallerySection(project),
+      projectSkillsSection(project.skills),
+      projectLinksSection(project)
+    ].join("");
   }
 
   const PROJECT_CATEGORY_OPTIONS = [
@@ -806,6 +926,58 @@
     }
   }
 
+  async function handleGalleryImageUpload(fileInput) {
+    const file = fileInput.files && fileInput.files[0];
+    if (!file) return;
+    const row = fileInput.closest("[data-gallery-row]");
+    const targetField = row ? row.querySelector("[data-gallery-src]") : null;
+    const status = row ? row.querySelector("[data-upload-status]") : null;
+
+    if (status) status.textContent = "Uploading...";
+    try {
+      const path = await uploadImageToGitHub(file);
+      if (targetField) targetField.value = path;
+      if (status) status.textContent = "Uploaded -- click Save to keep it.";
+    } catch (error) {
+      if (status) status.textContent = error.message || "Upload failed.";
+    } finally {
+      fileInput.value = "";
+    }
+  }
+
+  function specRowHtml(key, value) {
+    return `
+      <div class="repeat-row" data-spec-row>
+        <input type="text" data-spec-key value="${escapeHtml(key)}" placeholder="Parameter">
+        <input type="text" data-spec-value value="${escapeHtml(value)}" placeholder="Value">
+        <button type="button" class="repeat-row-remove" data-spec-remove aria-label="Remove spec row">&times;</button>
+      </div>`;
+  }
+
+  function detailRowHtml(item) {
+    return `
+      <div class="repeat-row repeat-row-stacked" data-detail-row>
+        <div class="repeat-row-head">
+          <input type="text" data-detail-heading value="${escapeHtml(item.heading)}" placeholder="Heading">
+          <button type="button" class="repeat-row-remove" data-detail-remove aria-label="Remove detail section">&times;</button>
+        </div>
+        <textarea data-detail-body placeholder="Body">${escapeHtml(item.body)}</textarea>
+      </div>`;
+  }
+
+  function galleryRowHtml(item) {
+    return `
+      <div class="repeat-row repeat-row-stacked" data-gallery-row>
+        <div class="repeat-row-head">
+          <input type="text" data-gallery-src value="${escapeHtml(item.src)}" placeholder="Paste a URL, or upload a file below">
+          <button type="button" class="repeat-row-remove" data-gallery-remove aria-label="Remove gallery image">&times;</button>
+        </div>
+        <input type="file" accept="image/*" data-gallery-upload>
+        <span class="upload-status" data-upload-status></span>
+        <input type="text" data-gallery-caption value="${escapeHtml(item.caption)}" placeholder="Caption">
+      </div>`;
+  }
+
   function blankProject() {
     return normalizeProject({
       id: `project-${Date.now()}`,
@@ -847,11 +1019,41 @@
           <details class="project-edit-extra">
             <summary>More fields</summary>
             <label>Stack <input type="text" data-field="stack" value="${escapeHtml(project.stack)}"></label>
-            <label>Details <textarea data-field="details">${escapeHtml(project.details)}</textarea></label>
+            <label>Tags, comma separated <input type="text" data-field="tags" value="${escapeHtml(project.tags.join(", "))}"></label>
+            <label>One-liner <input type="text" data-field="oneLiner" value="${escapeHtml(project.oneLiner)}"></label>
+            <label>Overview <textarea data-field="overview">${escapeHtml(project.overview)}</textarea></label>
+            <label>My role, leave blank to hide <textarea data-field="role">${escapeHtml(project.role)}</textarea></label>
             ${imageUploadFieldHtml(project.image)}
             <label>Image alt text <input type="text" data-field="imageAlt" value="${escapeHtml(project.imageAlt)}"></label>
-            <label>Link label <input type="text" data-field="linkLabel" value="${escapeHtml(project.linkLabel)}"></label>
-            <label>Link URL <input type="text" data-field="linkUrl" value="${escapeHtml(project.linkUrl)}"></label>
+
+            <div class="repeat-group">
+              <span class="project-detail-label">Key specifications</span>
+              <div data-specs-list>${project.specs.map(([key, value]) => specRowHtml(key, value)).join("")}</div>
+              <button type="button" class="btn btn-small btn-ghost repeat-add-btn" data-spec-add>+ Add spec</button>
+            </div>
+
+            <div class="repeat-group">
+              <span class="project-detail-label">Technical detail sections</span>
+              <div data-detail-list>${project.detail.map(detailRowHtml).join("")}</div>
+              <button type="button" class="btn btn-small btn-ghost repeat-add-btn" data-detail-add>+ Add section</button>
+            </div>
+
+            <div class="repeat-group">
+              <span class="project-detail-label">Gallery</span>
+              <div data-gallery-list>${project.gallery.map(galleryRowHtml).join("")}</div>
+              <button type="button" class="btn btn-small btn-ghost repeat-add-btn" data-gallery-add>+ Add image</button>
+            </div>
+
+            <label>Skills / tools, comma separated <input type="text" data-field="skills" value="${escapeHtml(project.skills.join(", "))}"></label>
+
+            <div class="repeat-group">
+              <span class="project-detail-label">Links</span>
+              <label>GitHub URL <input type="text" data-field="linksGithub" value="${escapeHtml(project.links.github)}"></label>
+              <label>Report URL <input type="text" data-field="linksReport" value="${escapeHtml(project.links.report)}"></label>
+              <label>Demo URL <input type="text" data-field="linksDemo" value="${escapeHtml(project.links.demo)}"></label>
+              <label>Other link label <input type="text" data-field="linkLabel" value="${escapeHtml(project.linkLabel)}"></label>
+              <label>Other link URL <input type="text" data-field="linkUrl" value="${escapeHtml(project.linkUrl)}"></label>
+            </div>
           </details>
         </div>
       </article>`;
@@ -869,6 +1071,19 @@
         const el = field(name);
         return el ? el.value.trim() : "";
       };
+      const specs = Array.from(card.querySelectorAll("[data-spec-row]")).map(row => [
+        row.querySelector("[data-spec-key]")?.value.trim() || "",
+        row.querySelector("[data-spec-value]")?.value.trim() || ""
+      ]);
+      const detail = Array.from(card.querySelectorAll("[data-detail-row]")).map(row => ({
+        heading: row.querySelector("[data-detail-heading]")?.value.trim() || "",
+        body: row.querySelector("[data-detail-body]")?.value.trim() || ""
+      }));
+      const gallery = Array.from(card.querySelectorAll("[data-gallery-row]")).map(row => ({
+        src: row.querySelector("[data-gallery-src]")?.value.trim() || "",
+        caption: row.querySelector("[data-gallery-caption]")?.value.trim() || ""
+      }));
+
       return normalizeProject({
         id: card.dataset.id,
         partNumber: text("partNumber"),
@@ -877,12 +1092,24 @@
         status: text("status"),
         stack: value("stack"),
         summary: text("summary"),
-        details: value("details"),
         image: value("image"),
         imageAlt: value("imageAlt"),
         linkLabel: value("linkLabel"),
         linkUrl: value("linkUrl"),
-        featured: Boolean(field("featured") && field("featured").checked)
+        featured: Boolean(field("featured") && field("featured").checked),
+        tags: splitList(value("tags")),
+        oneLiner: value("oneLiner"),
+        overview: value("overview"),
+        role: value("role"),
+        specs,
+        detail,
+        gallery,
+        skills: splitList(value("skills")),
+        links: {
+          github: value("linksGithub"),
+          report: value("linksReport"),
+          demo: value("linksDemo")
+        }
       });
     });
   }
@@ -972,12 +1199,42 @@
     document.addEventListener("click", event => {
       if (event.target.closest("[data-project-remove]")) {
         event.target.closest("[data-project-edit-card]")?.remove();
+        return;
+      }
+      if (event.target.closest("[data-spec-add]")) {
+        event.target.closest("[data-project-edit-card]")?.querySelector("[data-specs-list]")
+          .insertAdjacentHTML("beforeend", specRowHtml("", ""));
+        return;
+      }
+      if (event.target.closest("[data-spec-remove]")) {
+        event.target.closest("[data-spec-row]")?.remove();
+        return;
+      }
+      if (event.target.closest("[data-detail-add]")) {
+        event.target.closest("[data-project-edit-card]")?.querySelector("[data-detail-list]")
+          .insertAdjacentHTML("beforeend", detailRowHtml({ heading: "", body: "" }));
+        return;
+      }
+      if (event.target.closest("[data-detail-remove]")) {
+        event.target.closest("[data-detail-row]")?.remove();
+        return;
+      }
+      if (event.target.closest("[data-gallery-add]")) {
+        event.target.closest("[data-project-edit-card]")?.querySelector("[data-gallery-list]")
+          .insertAdjacentHTML("beforeend", galleryRowHtml({ src: "", caption: "" }));
+        return;
+      }
+      if (event.target.closest("[data-gallery-remove]")) {
+        event.target.closest("[data-gallery-row]")?.remove();
       }
     });
 
     document.addEventListener("change", event => {
       if (event.target.matches("[data-project-edit-card] [data-image-upload]")) {
         handleInlineImageUpload(event.target);
+      }
+      if (event.target.matches("[data-project-edit-card] [data-gallery-upload]")) {
+        handleGalleryImageUpload(event.target);
       }
     });
   }

@@ -319,16 +319,37 @@ window.PORTFOLIO_DEFAULTS = {
     {
       id: "adc",
       partNumber: "ADC-FMC-06",
-      title: "Dual ADS8568 FMC carrier board",
+      title: "Dual ADS8568 FMC Carrier Board",
       category: "pcb-hardware",
       status: "Complete",
-      stack: "Altium, ADS8568, Nexys Video, Artix-7",
-      summary: "Custom PCB carrying dual ADS8568 SAR ADCs in parallel 16-bit mode over an FMC interface.",
-      details: "Involved full signal-chain analysis, component selection, and Altium PCB design for an FPGA-connected data acquisition board.",
+      tags: ["PCB", "MIXED-SIGNAL", "ADC"],
+      stack: "Altium Designer, ADS8568, Nexys Video (Artix-7), FMC-LPC, REF6025",
+      oneLiner: "A 4-layer mixed-signal FMC carrier board digitising 12 conditioned analogue channels for an FPGA-based motor-dynamometer DAQ.",
+      overview: "Interfaces two ADS8568 16-bit simultaneous-sampling SAR ADCs to a Xilinx Artix-7 FPGA over the FMC-LPC connector. Accepts twelve conditioned 0-10 V analogue channels, protects and buffers each ADC input, and routes the parallel data and control buses to the FPGA for deterministic 200 kS/s acquisition. Part of an MEng motor-dynamometer DAQ replacing a prior microcontroller design limited by channel skew and throughput.",
+      specs: [
+        ["ADCs", "2x TI ADS8568, 16-bit, 8-ch simultaneous SAR"],
+        ["Channels", "12 (6 voltage + 6 current)"],
+        ["Input range", "0-10 V conditioned"],
+        ["Reference", "REF6025, 2.5 V precision (jumper-selectable)"],
+        ["FPGA interface", "FMC-LPC -> Nexys Video (Artix-7 XC7A200T)"],
+        ["Interface mode", "Parallel 16-bit"],
+        ["PCB", "4-layer mixed-signal"],
+        ["Supply", "24 V in -> 5 V analogue, 3.3 V digital (from FMC)"],
+        ["Main-component BOM", "~£167"]
+      ],
+      detail: [
+        { heading: "Architecture", body: "Sits between the analogue sensor boards and the FPGA. Conditioned 0-10 V signals enter via D-Sub, pass through buffering, RC filtering and ADC-input protection, then reach the two ADS8568 devices. The FPGA drives conversion-start, read and reset lines and reads back the parallel data/status buses through FMC-LPC." },
+        { heading: "Design decisions", body: "Chose the ADS8568 (true-bipolar, simultaneous-sampling SAR) over delta-sigma and pipeline alternatives because the motor waveforms are PWM-like and demand low-latency, phase-coherent multi-channel sampling. External REF6025 reference, jumper-selectable, for ADC accuracy." },
+        { heading: "Implementation", body: "4-layer mixed-signal stack-up for controlled grounding and clean power distribution. Analogue input section physically separated from the digital section; analogue traces kept short and direct; FMC-LPC connector positioned to mate mechanically with the Nexys Video board." },
+        { heading: "Challenges & solutions", body: "Shared CONVST/RESET across both ADCs handled with OR-gated reset logic. TVS protection on the 24 V rail. JTAG deliberately omitted since no components are JTAG-capable, using the 0 Ω bypass convention for the mezzanine." }
+      ],
+      gallery: [],
+      skills: ["Mixed-signal PCB", "Altium Designer", "16-bit SAR ADC interfacing", "FMC-LPC", "Artix-7 FPGA", "Analogue signal conditioning", "Power integrity", "Grounding & isolation", "BOM engineering"],
       image: "",
-      imageAlt: "ADC FMC carrier board project preview",
+      imageAlt: "Dual ADS8568 FMC carrier board project preview",
       linkLabel: "",
       linkUrl: "",
+      links: { github: "", report: "", demo: "" },
       featured: false
     },
     {

@@ -1614,6 +1614,7 @@ h3 {
   font-family: var(--font-mono);
   font-size: 11px;
   padding: 4px 10px;
+  text-transform: uppercase;
 }
 
 .project-image-link {
@@ -1630,28 +1631,13 @@ h3 {
   color: var(--teal);
 }
 
-.project-detail {
-  align-items: start;
-  display: grid;
-  gap: 28px;
-  grid-template-columns: minmax(280px, 0.9fr) minmax(0, 1.1fr);
-}
-
-.project-detail-image {
-  aspect-ratio: 16 / 10;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  object-fit: cover;
-  width: 100%;
-}
-
-.project-detail-body h1 {
+.project-detail-header h1 {
   font-size: 2rem;
-  margin: 12px 0 16px;
+  margin: 14px 0 16px;
 }
 
 .project-detail-stack {
-  margin: 18px 0;
+  margin-top: 18px;
 }
 
 .project-detail-label {
@@ -1659,13 +1645,75 @@ h3 {
   display: block;
   font-family: var(--font-mono);
   font-size: 11px;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   text-transform: uppercase;
 }
 
-.project-detail-stack p {
+.project-section-text {
   color: var(--ink-soft);
-  margin: 0;
+  max-width: 72ch;
+}
+
+.detail-accordion {
+  display: grid;
+  gap: 10px;
+}
+
+.detail-item {
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+
+.detail-item summary {
+  color: var(--teal);
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-weight: 600;
+  list-style: none;
+}
+
+.detail-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.detail-item summary::before {
+  color: var(--accent-deep);
+  content: "+";
+  display: inline-block;
+  width: 1em;
+}
+
+.detail-item[open] summary::before {
+  content: "\2212";
+}
+
+.detail-item p {
+  color: var(--ink-soft);
+  margin: 12px 0 0;
+}
+
+.project-gallery-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.project-gallery-item img {
+  aspect-ratio: 16 / 10;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  object-fit: cover;
+  width: 100%;
+}
+
+.project-gallery-item figcaption {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  margin-top: 8px;
 }
 
 .project-edit-entry {
@@ -1799,6 +1847,59 @@ h3 {
 .project-edit-extra textarea {
   min-height: 60px;
   resize: vertical;
+}
+
+.project-edit-extra .repeat-group {
+  border-top: 1px solid var(--line);
+  margin-top: 14px;
+  padding-top: 10px;
+}
+
+.project-edit-extra .repeat-row {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.project-edit-extra .repeat-row:not(.repeat-row-stacked) {
+  align-items: center;
+  grid-template-columns: 1fr 1fr auto;
+}
+
+.project-edit-extra .repeat-row-head {
+  align-items: center;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 1fr auto;
+}
+
+.project-edit-extra .repeat-row input,
+.project-edit-extra .repeat-row textarea {
+  margin: 0;
+}
+
+.repeat-row-remove {
+  align-items: center;
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  color: var(--danger);
+  cursor: pointer;
+  display: flex;
+  flex: 0 0 auto;
+  font-size: 13px;
+  height: 22px;
+  justify-content: center;
+  width: 22px;
+}
+
+.repeat-row-remove:hover {
+  background: var(--danger);
+  color: var(--surface);
+}
+
+.repeat-add-btn {
+  margin-top: 10px;
 }
 
 .timeline-list {
@@ -2492,8 +2593,7 @@ h3 {
   .skill-map-card,
   .toolkit-panel,
   .contact-shell,
-  .monitor-grid,
-  .project-detail {
+  .monitor-grid {
     grid-template-columns: 1fr;
   }
 
