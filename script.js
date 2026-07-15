@@ -1921,12 +1921,22 @@
       return `<line class="skill-radar-axis" x1="${cx}" y1="${cy}" x2="${p.x.toFixed(1)}" y2="${p.y.toFixed(1)}"></line>`;
     }).join("");
 
+    // Reserve extra room in the coordinate space around the octagon so the
+    // longest axis pills ("Verification & Testing", "AI / Data / Tools")
+    // have somewhere to render without clipping against the card edge.
     const viewSize = 420;
+    const padLeft = 230;
+    const padRight = 50;
+    const padTop = 40;
+    const padBottom = 40;
+    const domainWidth = viewSize + padLeft + padRight;
+    const domainHeight = viewSize + padTop + padBottom;
+
     const labelChips = map.map((item, index) => {
       const label = point(index, 5, radius + 34);
       const anchor = label.x < cx - 8 ? "end" : label.x > cx + 8 ? "start" : "middle";
-      const leftPct = (label.x / viewSize) * 100;
-      const topPct = (label.y / viewSize) * 100;
+      const leftPct = ((label.x + padLeft) / domainWidth) * 100;
+      const topPct = ((label.y + padTop) / domainHeight) * 100;
       return `<div class="skill-radar-label" data-anchor="${anchor}" style="left:${leftPct.toFixed(2)}%; top:${topPct.toFixed(2)}%;">${escapeHtml(item.label)}</div>`;
     }).join("");
 
@@ -1938,7 +1948,7 @@
     target.innerHTML = `
       <div class="skill-map-card">
         <div class="skill-radar-wrap">
-          <svg class="skill-radar" viewBox="0 0 ${viewSize} ${viewSize}" role="img" aria-label="Engineering skill map">
+          <svg class="skill-radar" viewBox="${-padLeft} ${-padTop} ${domainWidth} ${domainHeight}" role="img" aria-label="Engineering skill map">
             ${rings}
             ${axisLines}
             <polygon class="skill-radar-shape" points="${shape}"></polygon>
