@@ -1051,10 +1051,16 @@ h3 {
   stroke-width: 3;
 }
 
+.skill-radar-label-bg {
+  fill: var(--bg);
+  stroke: var(--line-strong);
+  stroke-width: 1;
+}
+
 .skill-radar-label {
   fill: var(--ink-soft);
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .skill-map-legend {
