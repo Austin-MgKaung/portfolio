@@ -1922,18 +1922,19 @@
     }).join("");
 
     // Reserve room in the coordinate space around the octagon so the axis
-    // pills (fixed-width, wrap to two lines) have somewhere to render
-    // without clipping against the card edge.
+    // pills have somewhere to render without clipping against the card
+    // edge -- sized generously enough to cover both the wide-screen
+    // single-line pills and the narrow-screen two-line pills.
     const viewSize = 420;
-    const padLeft = 210;
-    const padRight = 210;
-    const padTop = 55;
-    const padBottom = 55;
+    const padLeft = 280;
+    const padRight = 190;
+    const padTop = 60;
+    const padBottom = 60;
     const domainWidth = viewSize + padLeft + padRight;
     const domainHeight = viewSize + padTop + padBottom;
 
     const labelChips = map.map((item, index) => {
-      const label = point(index, 5, radius + 34);
+      const label = point(index, 5, radius + 44);
       const anchor = label.x < cx - 8 ? "end" : label.x > cx + 8 ? "start" : "middle";
       const leftPct = ((label.x + padLeft) / domainWidth) * 100;
       const topPct = ((label.y + padTop) / domainHeight) * 100;
