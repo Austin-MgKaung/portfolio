@@ -1955,7 +1955,7 @@
 
     target.innerHTML = `
       <div class="skill-map-card">
-        <svg class="skill-radar" viewBox="0 0 420 420" role="img" aria-label="Engineering skill map">
+        <svg class="skill-radar" viewBox="-40 -40 500 500" role="img" aria-label="Engineering skill map">
           ${rings}
           ${axes}
           <polygon class="skill-radar-shape" points="${shape}"></polygon>
