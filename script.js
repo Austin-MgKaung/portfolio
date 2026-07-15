@@ -1947,13 +1947,15 @@
 
     target.innerHTML = `
       <div class="skill-map-card">
-        <div class="skill-radar-wrap">
-          <svg class="skill-radar" viewBox="${-padLeft} ${-padTop} ${domainWidth} ${domainHeight}" role="img" aria-label="Engineering skill map">
-            ${rings}
-            ${axisLines}
-            <polygon class="skill-radar-shape" points="${shape}"></polygon>
-          </svg>
-          ${labelChips}
+        <div class="skill-radar-scroll">
+          <div class="skill-radar-wrap">
+            <svg class="skill-radar" viewBox="${-padLeft} ${-padTop} ${domainWidth} ${domainHeight}" role="img" aria-label="Engineering skill map">
+              ${rings}
+              ${axisLines}
+              <polygon class="skill-radar-shape" points="${shape}"></polygon>
+            </svg>
+            ${labelChips}
+          </div>
         </div>
         <div class="skill-map-legend">
           ${map.map(item => `

@@ -1027,10 +1027,15 @@ h3 {
   padding: 24px;
 }
 
+.skill-radar-scroll {
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
 .skill-radar-wrap {
   position: relative;
-  width: 100%;
-  min-width: 0;
+  width: 420px;
 }
 
 .skill-radar {
