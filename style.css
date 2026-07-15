@@ -1022,7 +1022,7 @@ h3 {
   display: grid;
   grid-template-columns: minmax(280px, 340px) minmax(240px, 320px);
   justify-content: start;
-  gap: 8px;
+  gap: 24px;
   align-items: center;
   padding: 24px;
 }
@@ -1031,6 +1031,7 @@ h3 {
   display: block;
   overflow: visible;
   width: 100%;
+  min-width: 0;
 }
 
 .skill-radar-ring {
