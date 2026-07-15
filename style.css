@@ -1027,11 +1027,16 @@ h3 {
   padding: 24px;
 }
 
+.skill-radar-wrap {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
 .skill-radar {
   display: block;
   overflow: visible;
   width: 100%;
-  min-width: 0;
 }
 
 .skill-radar-ring {
@@ -1051,16 +1056,27 @@ h3 {
   stroke-width: 3;
 }
 
-.skill-radar-label-bg {
-  fill: var(--bg);
-  stroke: var(--line-strong);
-  stroke-width: 1;
+.skill-radar-label {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--teal) 16%, var(--surface));
+  border: 1px solid var(--teal);
+  color: var(--teal);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 12px;
+  pointer-events: none;
 }
 
-.skill-radar-label {
-  fill: var(--ink-soft);
-  font-family: var(--font-mono);
-  font-size: 14px;
+.skill-radar-label[data-anchor="start"] {
+  transform: translate(4px, -50%);
+}
+
+.skill-radar-label[data-anchor="end"] {
+  transform: translate(calc(-100% - 4px), -50%);
 }
 
 .skill-map-legend {

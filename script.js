@@ -1878,23 +1878,6 @@
     return [];
   }
 
-  function wrapLabelLines(text, maxLineLength) {
-    const words = String(text || "").split(" ").filter(Boolean);
-    const lines = [];
-    let current = "";
-    words.forEach(word => {
-      const candidate = current ? `${current} ${word}` : word;
-      if (candidate.length > maxLineLength && current) {
-        lines.push(current);
-        current = word;
-      } else {
-        current = candidate;
-      }
-    });
-    if (current) lines.push(current);
-    return lines.length ? lines : [""];
-  }
-
   function renderSkillMap() {
     const target = document.querySelector("[data-skill-map]");
     if (!target) return;
@@ -1933,35 +1916,18 @@
       return `<polygon class="skill-radar-ring" points="${points}"></polygon>`;
     }).join("");
 
-    const labelFontSize = 14;
-    const lineHeight = 17;
-    const charWidth = labelFontSize * 0.62;
-    const bubblePadX = 8;
-    const bubblePadY = 5;
-
-    const axes = map.map((item, index) => {
+    const axisLines = map.map((_, index) => {
       const p = point(index, 5);
-      const label = point(index, 5, radius + 46);
+      return `<line class="skill-radar-axis" x1="${cx}" y1="${cy}" x2="${p.x.toFixed(1)}" y2="${p.y.toFixed(1)}"></line>`;
+    }).join("");
+
+    const viewSize = 420;
+    const labelChips = map.map((item, index) => {
+      const label = point(index, 5, radius + 34);
       const anchor = label.x < cx - 8 ? "end" : label.x > cx + 8 ? "start" : "middle";
-      const lines = wrapLabelLines(item.label, 12);
-      const tspans = lines.map((line, i) => {
-        const dy = i === 0 ? (lines.length > 1 ? -(lineHeight / 2) : 0) : lineHeight;
-        return `<tspan x="${label.x.toFixed(1)}" dy="${dy}">${escapeHtml(line)}</tspan>`;
-      }).join("");
-
-      const textWidth = Math.max(...lines.map(line => line.length)) * charWidth;
-      const bubbleWidth = textWidth + bubblePadX * 2;
-      const bubbleHeight = (lines.length > 1 ? lines.length * lineHeight : labelFontSize) + bubblePadY * 2;
-      const bubbleCenterY = lines.length > 1 ? label.y : label.y - labelFontSize * 0.35;
-      const bubbleX = anchor === "start" ? label.x - bubblePadX
-        : anchor === "end" ? label.x - textWidth - bubblePadX
-        : label.x - bubbleWidth / 2;
-      const bubbleY = bubbleCenterY - bubbleHeight / 2;
-
-      return `
-        <line class="skill-radar-axis" x1="${cx}" y1="${cy}" x2="${p.x.toFixed(1)}" y2="${p.y.toFixed(1)}"></line>
-        <rect class="skill-radar-label-bg" x="${bubbleX.toFixed(1)}" y="${bubbleY.toFixed(1)}" width="${bubbleWidth.toFixed(1)}" height="${bubbleHeight.toFixed(1)}" rx="${(bubbleHeight / 2).toFixed(1)}"></rect>
-        <text class="skill-radar-label" y="${label.y.toFixed(1)}" text-anchor="${anchor}">${tspans}</text>`;
+      const leftPct = (label.x / viewSize) * 100;
+      const topPct = (label.y / viewSize) * 100;
+      return `<div class="skill-radar-label" data-anchor="${anchor}" style="left:${leftPct.toFixed(2)}%; top:${topPct.toFixed(2)}%;">${escapeHtml(item.label)}</div>`;
     }).join("");
 
     const shape = map.map((item, index) => {
@@ -1971,11 +1937,14 @@
 
     target.innerHTML = `
       <div class="skill-map-card">
-        <svg class="skill-radar" viewBox="-70 -70 560 560" role="img" aria-label="Engineering skill map">
-          ${rings}
-          ${axes}
-          <polygon class="skill-radar-shape" points="${shape}"></polygon>
-        </svg>
+        <div class="skill-radar-wrap">
+          <svg class="skill-radar" viewBox="0 0 ${viewSize} ${viewSize}" role="img" aria-label="Engineering skill map">
+            ${rings}
+            ${axisLines}
+            <polygon class="skill-radar-shape" points="${shape}"></polygon>
+          </svg>
+          ${labelChips}
+        </div>
         <div class="skill-map-legend">
           ${map.map(item => `
             <div class="skill-map-row">
