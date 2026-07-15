@@ -1054,7 +1054,7 @@ h3 {
 .skill-radar-label {
   fill: var(--ink-soft);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .skill-map-legend {

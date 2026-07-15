@@ -1938,7 +1938,7 @@
       const label = point(index, 5, radius + 42);
       const anchor = label.x < cx - 8 ? "end" : label.x > cx + 8 ? "start" : "middle";
       const lines = wrapLabelLines(item.label, 12);
-      const lineHeight = 11;
+      const lineHeight = 14;
       const tspans = lines.map((line, i) => {
         const dy = i === 0 ? (lines.length > 1 ? -(lineHeight / 2) : 0) : lineHeight;
         return `<tspan x="${label.x.toFixed(1)}" dy="${dy}">${escapeHtml(line)}</tspan>`;
