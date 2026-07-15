@@ -1020,8 +1020,9 @@ h3 {
   border: 1px solid var(--line);
   border-radius: 8px;
   display: grid;
-  grid-template-columns: minmax(300px, 420px) minmax(260px, 1fr);
-  gap: 28px;
+  grid-template-columns: minmax(280px, 340px) minmax(240px, 320px);
+  justify-content: start;
+  gap: 8px;
   align-items: center;
   padding: 24px;
 }
