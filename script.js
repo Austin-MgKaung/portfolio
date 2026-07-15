@@ -1921,14 +1921,14 @@
       return `<line class="skill-radar-axis" x1="${cx}" y1="${cy}" x2="${p.x.toFixed(1)}" y2="${p.y.toFixed(1)}"></line>`;
     }).join("");
 
-    // Reserve extra room in the coordinate space around the octagon so the
-    // longest axis pills ("Verification & Testing", "AI / Data / Tools")
-    // have somewhere to render without clipping against the card edge.
+    // Reserve room in the coordinate space around the octagon so the axis
+    // pills (fixed-width, wrap to two lines) have somewhere to render
+    // without clipping against the card edge.
     const viewSize = 420;
-    const padLeft = 230;
-    const padRight = 50;
-    const padTop = 40;
-    const padBottom = 40;
+    const padLeft = 210;
+    const padRight = 210;
+    const padTop = 55;
+    const padBottom = 55;
     const domainWidth = viewSize + padLeft + padRight;
     const domainHeight = viewSize + padTop + padBottom;
 
@@ -1947,15 +1947,13 @@
 
     target.innerHTML = `
       <div class="skill-map-card">
-        <div class="skill-radar-scroll">
-          <div class="skill-radar-wrap">
-            <svg class="skill-radar" viewBox="${-padLeft} ${-padTop} ${domainWidth} ${domainHeight}" role="img" aria-label="Engineering skill map">
-              ${rings}
-              ${axisLines}
-              <polygon class="skill-radar-shape" points="${shape}"></polygon>
-            </svg>
-            ${labelChips}
-          </div>
+        <div class="skill-radar-wrap">
+          <svg class="skill-radar" viewBox="${-padLeft} ${-padTop} ${domainWidth} ${domainHeight}" role="img" aria-label="Engineering skill map">
+            ${rings}
+            ${axisLines}
+            <polygon class="skill-radar-shape" points="${shape}"></polygon>
+          </svg>
+          ${labelChips}
         </div>
         <div class="skill-map-legend">
           ${map.map(item => `
