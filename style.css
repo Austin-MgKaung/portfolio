@@ -1021,7 +1021,7 @@ h3 {
   border-radius: 8px;
   display: grid;
   grid-template-columns: minmax(280px, 340px) minmax(240px, 320px);
-  justify-content: start;
+  justify-content: space-between;
   gap: 24px;
   align-items: center;
   padding: 24px;
