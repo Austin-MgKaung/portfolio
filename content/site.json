@@ -425,5 +425,17 @@
       "imageAlt": ""
     }
   ],
-  "certificates": []
+  "certificates": [
+    {
+      "title": "New certificate",
+      "issuer": "",
+      "date": "",
+      "summary": "Add a summary...",
+      "skills": [],
+      "image": "",
+      "imageAlt": "New certificate image",
+      "linkLabel": "",
+      "linkUrl": ""
+    }
+  ]
 }
