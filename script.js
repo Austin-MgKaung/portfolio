@@ -19,6 +19,27 @@
     embedded: "Embedded / IoT"
   };
 
+  const CERTIFICATE_GROUPS = [
+    {
+      key: "academic",
+      label: "Academic",
+      title: "Degree & Academic Credentials",
+      summary: "Degree certificates, transcripts, university awards, and academic records."
+    },
+    {
+      key: "professional",
+      label: "Professional",
+      title: "Professional Certifications",
+      summary: "Industry or vendor credentials such as SOLIDWORKS CAD and Cisco networking certificates."
+    },
+    {
+      key: "course",
+      label: "Course",
+      title: "Course Certificates",
+      summary: "Short courses, workshops, and training records that support the engineering profile."
+    }
+  ];
+
   function clone(value) {
     return JSON.parse(JSON.stringify(value));
   }
@@ -39,6 +60,18 @@
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "")
       .slice(0, 48) || "project";
+  }
+
+  function certificateCategory(value) {
+    const normalized = slug(value || "course");
+    if (["academic", "degree", "education", "university"].includes(normalized)) return "academic";
+    if (["professional", "certification", "vendor", "industry"].includes(normalized)) return "professional";
+    return "course";
+  }
+
+  function certificateGroup(category) {
+    const key = certificateCategory(category);
+    return CERTIFICATE_GROUPS.find(group => group.key === key) || CERTIFICATE_GROUPS[CERTIFICATE_GROUPS.length - 1];
   }
 
   function initials(value) {
@@ -130,7 +163,9 @@
   }
 
   function normalizeCertificate(item) {
+    item = item || {};
     return {
+      category: certificateCategory(item.category || item.type || item.kind),
       title: item.title || "Certificate",
       issuer: item.issuer || "",
       date: item.date || "",
@@ -1262,6 +1297,7 @@
 
   function blankCertificate() {
     return normalizeCertificate({
+      category: "professional",
       title: "New certificate",
       issuer: "",
       date: "",
@@ -1269,10 +1305,23 @@
     });
   }
 
+  function certificateCategorySelectHtml(category) {
+    const activeCategory = certificateCategory(category);
+    return `
+      <label>Credential type
+        <select data-field="category">
+          ${CERTIFICATE_GROUPS.map(group => `
+            <option value="${escapeHtml(group.key)}"${group.key === activeCategory ? " selected" : ""}>${escapeHtml(group.title)}</option>
+          `).join("")}
+        </select>
+      </label>`;
+  }
+
   function certificateEditCard(cert) {
     const image = cert.image
       ? `<img class="certificate-image" src="${escapeHtml(cert.image)}" alt="${escapeHtml(cert.imageAlt || cert.title)}">`
       : `<div class="certificate-placeholder">Certificate</div>`;
+    const group = certificateGroup(cert.category);
 
     return `
       <article class="certificate-card project-card-editable" data-certificate-edit-card>
@@ -1280,6 +1329,7 @@
         ${image}
         <div class="certificate-body">
           <div class="certificate-meta">
+            <span class="certificate-type">${escapeHtml(group.label)}</span>
             <span class="editable-field" contenteditable="true" data-field="issuer">${escapeHtml(cert.issuer)}</span>
             <span class="editable-field" contenteditable="true" data-field="date">${escapeHtml(cert.date)}</span>
           </div>
@@ -1287,6 +1337,7 @@
           <p class="editable-field" contenteditable="true" data-field="summary">${escapeHtml(cert.summary)}</p>
           <details class="project-edit-extra">
             <summary>More fields</summary>
+            ${certificateCategorySelectHtml(cert.category)}
             <label>Related skills (comma separated) <input type="text" data-field="skillsCsv" value="${escapeHtml(cert.skills.join(", "))}"></label>
             ${imageUploadFieldHtml(cert.image)}
             <label>Image alt text <input type="text" data-field="imageAlt" value="${escapeHtml(cert.imageAlt)}"></label>
@@ -1311,6 +1362,7 @@
       };
       const skillsCsv = value("skillsCsv");
       return normalizeCertificate({
+        category: value("category"),
         title: text("title"),
         issuer: text("issuer"),
         date: text("date"),
@@ -1327,6 +1379,7 @@
   function renderCertificateEditGrid() {
     const target = document.querySelector("[data-certificates-list]");
     if (!target) return;
+    target.classList.add("is-editing");
     const certificates = (defaults.certificates || []).map(normalizeCertificate);
     target.innerHTML = certificates.length
       ? certificates.map(certificateEditCard).join("")
@@ -2144,13 +2197,15 @@
     const target = document.querySelector("[data-certificates-list]");
     if (!target) return;
 
+    target.classList.remove("is-editing");
     const certificates = (defaults.certificates || []).map(normalizeCertificate);
     if (!certificates.length) {
       target.innerHTML = emptyState("No certificates added yet", "Use Admin to add certificates, training records, awards, or verified credentials.");
       return;
     }
 
-    target.innerHTML = certificates.map(cert => {
+    function certificateCard(cert) {
+      const group = certificateGroup(cert.category);
       const link = cert.linkUrl && cert.linkLabel
         ? `<a class="inline-link" href="${escapeHtml(cert.linkUrl)}" target="_blank" rel="noopener">${escapeHtml(cert.linkLabel)}</a>`
         : "";
@@ -2163,6 +2218,7 @@
           ${image}
           <div class="certificate-body">
             <div class="certificate-meta">
+              <span class="certificate-type">${escapeHtml(group.label)}</span>
               ${cert.issuer ? `<span>${escapeHtml(cert.issuer)}</span>` : ""}
               ${cert.date ? `<span>${escapeHtml(cert.date)}</span>` : ""}
             </div>
@@ -2172,6 +2228,26 @@
             ${link}
           </div>
         </article>`;
+    }
+
+    target.innerHTML = CERTIFICATE_GROUPS.map(group => {
+      const groupCertificates = certificates.filter(cert => cert.category === group.key);
+      if (!groupCertificates.length) return "";
+
+      return `
+        <section class="certificate-section" data-certificate-section="${escapeHtml(group.key)}">
+          <div class="section-head certificate-section-head">
+            <div>
+              <span class="certificate-section-kicker">${escapeHtml(group.label)}</span>
+              <h2>${escapeHtml(group.title)}</h2>
+              <p>${escapeHtml(group.summary)}</p>
+            </div>
+            <span class="certificate-section-count">${groupCertificates.length}</span>
+          </div>
+          <div class="certificate-grid">
+            ${groupCertificates.map(certificateCard).join("")}
+          </div>
+        </section>`;
     }).join("");
   }
 

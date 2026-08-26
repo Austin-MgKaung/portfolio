@@ -162,6 +162,14 @@ collections:
             widget: "list"
             summary: "{{fields.title}}"
             fields:
+              - label: "Credential Type"
+                name: "category"
+                widget: "select"
+                default: "course"
+                options:
+                  - { label: "Degree / Academic Credentials", value: "academic" }
+                  - { label: "Professional Certifications", value: "professional" }
+                  - { label: "Course Certificates", value: "course" }
               - { label: "Title", name: "title", widget: "string" }
               - { label: "Issuer", name: "issuer", widget: "string", required: false }
               - { label: "Date", name: "date", widget: "string", required: false, hint: "For example: Jun 2026 or 2026." }

@@ -427,13 +427,70 @@
   ],
   "certificates": [
     {
-      "title": "New certificate",
-      "issuer": "",
-      "date": "",
-      "summary": "Add a summary...",
-      "skills": [],
+      "category": "academic",
+      "title": "MEng Electrical and Electronic Engineering",
+      "issuer": "University of Sheffield",
+      "date": "2022 - 2026",
+      "summary": "Academic credential covering electronics, embedded systems, FPGA and digital design, signal processing, PCB hardware, and an integrated industrial placement year.",
+      "skills": [
+        "Electrical engineering",
+        "Embedded systems",
+        "PCB hardware",
+        "Industrial placement"
+      ],
       "image": "",
-      "imageAlt": "New certificate image",
+      "imageAlt": "University degree credential preview",
+      "linkLabel": "",
+      "linkUrl": ""
+    },
+    {
+      "category": "professional",
+      "title": "SOLIDWORKS CAD Certificate",
+      "issuer": "SOLIDWORKS",
+      "date": "",
+      "summary": "CAD credential supporting part modelling, assemblies, engineering drawings, enclosure design, mounting hardware, and mechanical fit checks for electronics projects.",
+      "skills": [
+        "SOLIDWORKS",
+        "3D CAD",
+        "Assemblies",
+        "Engineering drawings"
+      ],
+      "image": "",
+      "imageAlt": "SOLIDWORKS certificate preview",
+      "linkLabel": "",
+      "linkUrl": ""
+    },
+    {
+      "category": "professional",
+      "title": "Cisco Networking / CCNA Certificate",
+      "issuer": "Cisco",
+      "date": "",
+      "summary": "Networking credential covering IP fundamentals, switching, routing, network services, and security basics relevant to embedded, IIoT, and connected-device systems.",
+      "skills": [
+        "Networking",
+        "IP connectivity",
+        "Switching",
+        "Routing"
+      ],
+      "image": "",
+      "imageAlt": "Cisco networking certificate preview",
+      "linkLabel": "",
+      "linkUrl": ""
+    },
+    {
+      "category": "course",
+      "title": "Embedded & Hardware Course Certificates",
+      "issuer": "Selected course providers",
+      "date": "",
+      "summary": "Short-course credentials for firmware, STM32, RTOS concepts, PCB design, lab measurement, and practical hardware/software integration.",
+      "skills": [
+        "Embedded C",
+        "STM32",
+        "PCB design",
+        "Lab measurement"
+      ],
+      "image": "",
+      "imageAlt": "Embedded and hardware course certificate preview",
       "linkLabel": "",
       "linkUrl": ""
     }
