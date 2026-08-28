@@ -428,19 +428,7 @@
   "certificates": [
     {
       "category": "academic",
-      "title": "SURE SCHEME RESEARCH Internship",
-      "issuer": "",
-      "date": "",
-      "summary": "Add a summary...",
-      "skills": [],
-      "image": "assets/uploads/1787941267871-my_sure_scheme.jpeg",
-      "imageAlt": "New certificate image",
-      "linkLabel": "",
-      "linkUrl": ""
-    },
-    {
-      "category": "academic",
-      "title": "MEng Electrical and Electronic Engineering with a Year In Industry",
+      "title": "MEng Electrical and Electronic Engineering",
       "issuer": "University of Sheffield",
       "date": "2022 - 2026",
       "summary": "Academic credential covering electronics, embedded systems, FPGA and digital design, signal processing, PCB hardware, and an integrated industrial placement year.",
@@ -450,7 +438,7 @@
         "PCB hardware",
         "Industrial placement"
       ],
-      "image": "assets/uploads/1787941174933-my_diploma.jpeg",
+      "image": "",
       "imageAlt": "University degree credential preview",
       "linkLabel": "",
       "linkUrl": ""
