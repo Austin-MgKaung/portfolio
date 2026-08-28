@@ -427,8 +427,20 @@
   ],
   "certificates": [
     {
+      "category": "professional",
+      "title": "New certificate",
+      "issuer": "",
+      "date": "",
+      "summary": "Add a summary...",
+      "skills": [],
+      "image": "",
+      "imageAlt": "New certificate image",
+      "linkLabel": "",
+      "linkUrl": ""
+    },
+    {
       "category": "academic",
-      "title": "MEng Electrical and Electronic Engineering",
+      "title": "MEng Electrical and Electronic Engineering with a Year In Industry",
       "issuer": "University of Sheffield",
       "date": "2022 - 2026",
       "summary": "Academic credential covering electronics, embedded systems, FPGA and digital design, signal processing, PCB hardware, and an integrated industrial placement year.",
@@ -438,7 +450,7 @@
         "PCB hardware",
         "Industrial placement"
       ],
-      "image": "assets/uploads/1787941043858-my_diploma.jpeg",
+      "image": "",
       "imageAlt": "University degree credential preview",
       "linkLabel": "",
       "linkUrl": ""
