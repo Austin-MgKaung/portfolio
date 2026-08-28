@@ -427,13 +427,13 @@
   ],
   "certificates": [
     {
-      "category": "professional",
-      "title": "New certificate",
+      "category": "academic",
+      "title": "SURE SCHEME RESEARCH Internship",
       "issuer": "",
       "date": "",
       "summary": "Add a summary...",
       "skills": [],
-      "image": "",
+      "image": "assets/uploads/1787941267871-my_sure_scheme.jpeg",
       "imageAlt": "New certificate image",
       "linkLabel": "",
       "linkUrl": ""
@@ -450,7 +450,7 @@
         "PCB hardware",
         "Industrial placement"
       ],
-      "image": "",
+      "image": "assets/uploads/1787941174933-my_diploma.jpeg",
       "imageAlt": "University degree credential preview",
       "linkLabel": "",
       "linkUrl": ""
