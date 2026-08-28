@@ -457,8 +457,25 @@ window.PORTFOLIO_DEFAULTS = {
         "PCB hardware",
         "Industrial placement"
       ],
-      image: "",
-      imageAlt: "University degree credential preview",
+      image: "assets/uploads/1787941174933-my_diploma.jpeg",
+      imageAlt: "University of Sheffield Master of Engineering degree certificate",
+      linkLabel: "",
+      linkUrl: ""
+    },
+    {
+      category: "academic",
+      title: "SURE Scheme 2024",
+      issuer: "University of Sheffield Academic Skills",
+      date: "2024",
+      summary: "Undergraduate research experience credential for completing a summer research project and producing academic outputs for a showcase event.",
+      skills: [
+        "Research",
+        "Academic communication",
+        "Project delivery",
+        "Engineering investigation"
+      ],
+      image: "assets/uploads/1787941267871-my_sure_scheme.jpeg",
+      imageAlt: "University of Sheffield SURE Scheme 2024 certificate",
       linkLabel: "",
       linkUrl: ""
     },
