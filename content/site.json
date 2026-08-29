@@ -427,6 +427,248 @@
   ],
   "certificates": [
     {
+      "category": "course",
+      "title": "PCB Design with EAGLE",
+      "issuer": "",
+      "date": "",
+      "summary": "Practical introduction to PCB design using Autodesk EAGLE, covering the workflow from schematic capture through PCB layout and preparing a board design for manufacture.",
+      "skills": [
+        "PCB Design",
+        "EAGLE PCB",
+        "Schematic Capture",
+        "PCB Layout",
+        "Component Placement",
+        "PCB Routing"
+      ],
+      "image": "assets/uploads/1788022025067-PCB_design_eagle.png",
+      "imageAlt": "LinkedIn Learning Learning PCB Design with EAGLE course certificate",
+      "linkLabel": "",
+      "linkUrl": ""
+    },
+    {
+      "category": "course",
+      "title": "C for Everyone, Part 2: Structured Programming",
+      "issuer": "",
+      "date": "",
+      "summary": "Intermediate C programming course covering structured programming, pointers, memory concepts, user-defined data structures, and more advanced C development techniques.",
+      "skills": [
+        "C",
+        "Structured Programming",
+        "Pointers",
+        "Memory Management",
+        "Data Structures"
+      ],
+      "image": "assets/uploads/1788021845582-C-for-Everyone--Part-2.png",
+      "imageAlt": "UC Santa Cruz C for Everyone Part 2 Structured Programming with Honors certificate",
+      "linkLabel": "Verify Certificate",
+      "linkUrl": "https://coursera.org/verify/A2U3SFRACWXS"
+    },
+    {
+      "category": "course",
+      "title": "C for Everyone, Part 1: Programming Fundamentals",
+      "issuer": "",
+      "date": "",
+      "summary": "Foundational C programming course covering variables, data types, operators, control flow, functions, arrays, and core procedural programming concepts.",
+      "skills": [
+        "C",
+        "Programming Fundamentals",
+        "Functions",
+        "Arrays",
+        "Algorithms",
+        "Procedural Programming"
+      ],
+      "image": "assets/uploads/1788021770638-C-for-Everyone--Part-1_Programming-Fundamentals.png",
+      "imageAlt": "UC Santa Cruz C for Everyone Part 1 Programming Fundamentals certificate",
+      "linkLabel": "Verify Certificate",
+      "linkUrl": "https://coursera.org/verify/4WFEXFDJ82UJ"
+    },
+    {
+      "category": "course",
+      "title": "Introduction to Data Science in Python",
+      "issuer": "",
+      "date": "",
+      "summary": "Introduction to data science using Python, with emphasis on Pandas, data cleaning, manipulation, analysis, and working with real-world datasets.",
+      "skills": [
+        "Python",
+        "Data Science",
+        "Pandas",
+        "Data Cleaning",
+        "Data Analysis"
+      ],
+      "image": "assets/uploads/1788021581252-Introduction-to-Data-Science-in-Python.png",
+      "imageAlt": "University of Michigan Introduction to Data Science in Python certificate",
+      "linkLabel": "Verify Certificate",
+      "linkUrl": "https://coursera.org/verify/NKXALZQTSU3W"
+    },
+    {
+      "category": "course",
+      "title": "Pandas",
+      "issuer": "",
+      "date": "",
+      "summary": "Practical course covering data manipulation and analysis with Pandas, including DataFrames, indexing, filtering, grouping, transformation, and data preparation.",
+      "skills": [
+        "Python",
+        "Pandas",
+        "Data Analysis",
+        "Data Manipulation",
+        "DataFrames"
+      ],
+      "image": "assets/uploads/1788021477617-Pandas.png",
+      "imageAlt": "Kaggle Pandas course certificate",
+      "linkLabel": "View Certificate",
+      "linkUrl": "https://www.kaggle.com/learn/certification/mgkaung/pandas"
+    },
+    {
+      "category": "course",
+      "title": "Python Programming Essentials",
+      "issuer": "",
+      "date": "",
+      "summary": "Foundational Python programming course covering expressions, variables, functions, conditional logic, iteration, and structured problem solving.",
+      "skills": [
+        "Python",
+        "Programming Fundamentals",
+        "Functions",
+        "Algorithms",
+        "Problem Solving"
+      ],
+      "image": "assets/uploads/1788021400707-Python-programming-Essentials.png",
+      "imageAlt": "Rice University Python Programming Essentials course certificate",
+      "linkLabel": "Verify Certificate",
+      "linkUrl": "https://coursera.org/verify/THVW635AVVXG"
+    },
+    {
+      "category": "course",
+      "title": "AI Programming with Python Nanodegree",
+      "issuer": "",
+      "date": "",
+      "summary": "AI-focused Nanodegree covering Python programming, NumPy, Pandas, Matplotlib, linear algebra, neural networks, and practical machine-learning workflows.",
+      "skills": [
+        "Python",
+        "Artificial Intelligence",
+        "NumPy",
+        "Pandas",
+        "Matplotlib",
+        "Neural Networks",
+        "Machine Learning"
+      ],
+      "image": "assets/uploads/1788021308005-AI-Programming-with-Python-Nanodegree.png",
+      "imageAlt": "Udacity AI Programming with Python Nanodegree certificate",
+      "linkLabel": "Verify Nanodegree",
+      "linkUrl": "https://www.udacity.com/certificate/7JFFCFG"
+    },
+    {
+      "category": "course",
+      "title": "Python for Everybody Specialization",
+      "issuer": "",
+      "date": "",
+      "summary": "Five-course Python specialization covering programming fundamentals, data structures, web data, databases, data processing, and visualization through practical projects.",
+      "skills": [
+        "Python",
+        "Data Structures",
+        "SQL",
+        "APIs",
+        "Web Data",
+        "Data Analysis",
+        "Data Visualization"
+      ],
+      "image": "assets/uploads/1788020857067-Python-for-Everybody-Specialization.png",
+      "imageAlt": "University of Michigan Python for Everybody Specialization certificate",
+      "linkLabel": "Verify Specialization",
+      "linkUrl": "https://coursera.org/verify/specialization/8R9NQVAV51ML"
+    },
+    {
+      "category": "course",
+      "title": "Using Databases with Python",
+      "issuer": "",
+      "date": "",
+      "summary": "Course covering relational databases, SQL, SQLite, data modelling, and integrating database systems with Python applications",
+      "skills": [
+        "Python",
+        "SQL",
+        "SQLite",
+        "Databases",
+        "Data Modelling"
+      ],
+      "image": "assets/uploads/1788020677109-Using-Databases-with-Python.png",
+      "imageAlt": "University of Michigan Using Databases with Python certificate",
+      "linkLabel": "Verify Certificate",
+      "linkUrl": "https://coursera.org/verify/V5ZTJHSU8RQB"
+    },
+    {
+      "category": "course",
+      "title": "Capstone: Retrieving, Processing, and Visualizing Data with Python",
+      "issuer": "",
+      "date": "",
+      "summary": "Capstone project applying Python to retrieve, process, analyse, and visualise data using techniques developed throughout the Python for Everybody programme.",
+      "skills": [
+        "Python",
+        "Data Processing",
+        "Data Visualization",
+        "APIs",
+        "Databases",
+        "Data Analysis"
+      ],
+      "image": "assets/uploads/1788020498042-Capstone_Retrieving_Processing_and_Visualiizing_Data_with_Python.png",
+      "imageAlt": "University of Michigan Python data processing and visualization capstone certificate",
+      "linkLabel": "Verify Certificate",
+      "linkUrl": "https://coursera.org/verify/9BZ2UF3P9E7Z"
+    },
+    {
+      "category": "course",
+      "title": "Using Python to Access Web Data",
+      "issuer": "",
+      "date": "",
+      "summary": "Applied Python course covering web requests, APIs, HTTP, JSON, XML, regular expressions, and extracting data from online sources.",
+      "skills": [
+        "Python",
+        "REST APIs",
+        "HTTP",
+        "JSON",
+        "XML",
+        "Web Scraping"
+      ],
+      "image": "assets/uploads/1788020340312-Using_Python_to_Access_Web_Data.png",
+      "imageAlt": "University of Michigan Using Python to Access Web Data certificate",
+      "linkLabel": "Verify Certificate",
+      "linkUrl": "https://coursera.org/verify/VLMM92DMRTMR"
+    },
+    {
+      "category": "course",
+      "title": "Python Data Structures",
+      "issuer": "",
+      "date": "",
+      "summary": "Course covering Python data structures including strings, lists, dictionaries, tuples, files, and techniques for organising and processing data.",
+      "skills": [
+        "Python",
+        "Data Structures",
+        "Lists",
+        "Dictionaries",
+        "File Processing"
+      ],
+      "image": "assets/uploads/1788020232705-Python_Data_Structures.png",
+      "imageAlt": "University of Michigan Python Data Structures course certificate",
+      "linkLabel": "Verify Certificate",
+      "linkUrl": "https://coursera.org/verify/LMVF8JBGN72T"
+    },
+    {
+      "category": "course",
+      "title": "Programming for Everybody (Getting Started with Python)",
+      "issuer": "",
+      "date": "",
+      "summary": "Introduction to Python programming covering variables, expressions, conditional execution, functions, loops, and fundamental programming concepts.",
+      "skills": [
+        "Python",
+        "Programming Fundamentals",
+        "Control Flow",
+        "Functions",
+        "Problem Solving"
+      ],
+      "image": "assets/uploads/1788020079748-Programming_for_Everybody_specialization.png",
+      "imageAlt": "University of Michigan Programming for Everybody Python course certificate",
+      "linkLabel": "Verify Certificate",
+      "linkUrl": "https://coursera.org/verify/7XF5VWXEYENG"
+    },
+    {
       "category": "academic",
       "title": "MEng Electrical and Electronic Engineering",
       "issuer": "University of Sheffield",
@@ -457,40 +699,6 @@
       ],
       "image": "assets/uploads/1787941267871-my_sure_scheme.jpeg",
       "imageAlt": "University of Sheffield SURE Scheme 2024 certificate",
-      "linkLabel": "",
-      "linkUrl": ""
-    },
-    {
-      "category": "professional",
-      "title": "SOLIDWORKS CAD Certificate",
-      "issuer": "SOLIDWORKS",
-      "date": "",
-      "summary": "CAD credential supporting part modelling, assemblies, engineering drawings, enclosure design, mounting hardware, and mechanical fit checks for electronics projects.",
-      "skills": [
-        "SOLIDWORKS",
-        "3D CAD",
-        "Assemblies",
-        "Engineering drawings"
-      ],
-      "image": "",
-      "imageAlt": "SOLIDWORKS certificate preview",
-      "linkLabel": "",
-      "linkUrl": ""
-    },
-    {
-      "category": "professional",
-      "title": "Cisco Networking / CCNA Certificate",
-      "issuer": "Cisco",
-      "date": "",
-      "summary": "Networking credential covering IP fundamentals, switching, routing, network services, and security basics relevant to embedded, IIoT, and connected-device systems.",
-      "skills": [
-        "Networking",
-        "IP connectivity",
-        "Switching",
-        "Routing"
-      ],
-      "image": "",
-      "imageAlt": "Cisco networking certificate preview",
       "linkLabel": "",
       "linkUrl": ""
     },
