@@ -673,12 +673,17 @@
       "title": "MEng Electrical and Electronic Engineering",
       "issuer": "University of Sheffield",
       "date": "2022 - 2026",
-      "summary": "Academic credential covering electronics, embedded systems, FPGA and digital design, signal processing, PCB hardware, and an integrated industrial placement year.",
+      "summary": "First-Class MEng with an electronics-focused curriculum covering embedded systems, FPGA and digital design, semiconductor devices, signal processing, integrated circuit design, PCB hardware, and electronic system design, alongside an industrial placement year at Air Products.",
       "skills": [
-        "Electrical engineering",
-        "Embedded systems",
-        "PCB hardware",
-        "Industrial placement"
+        "Embedded Systems",
+        "FPGA",
+        "Digital Design",
+        "Semiconductor Devices",
+        "Integrated Circuit Design",
+        "Signal Processing",
+        "PCB Design",
+        "Electronic System Design",
+        "Industrial Electronics"
       ],
       "image": "assets/uploads/1787941174933-my_diploma.jpeg",
       "imageAlt": "University of Sheffield Master of Engineering degree certificate",
@@ -699,23 +704,6 @@
       ],
       "image": "assets/uploads/1787941267871-my_sure_scheme.jpeg",
       "imageAlt": "University of Sheffield SURE Scheme 2024 certificate",
-      "linkLabel": "",
-      "linkUrl": ""
-    },
-    {
-      "category": "course",
-      "title": "Embedded & Hardware Course Certificates",
-      "issuer": "Selected course providers",
-      "date": "",
-      "summary": "Short-course credentials for firmware, STM32, RTOS concepts, PCB design, lab measurement, and practical hardware/software integration.",
-      "skills": [
-        "Embedded C",
-        "STM32",
-        "PCB design",
-        "Lab measurement"
-      ],
-      "image": "",
-      "imageAlt": "Embedded and hardware course certificate preview",
       "linkLabel": "",
       "linkUrl": ""
     }
